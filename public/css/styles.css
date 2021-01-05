@@ -1,0 +1,32 @@
+
+body, html {
+    height: 100%;
+    
+    background-image: url("/public/image/bg-image.png");
+    
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    text-align: center;
+    margin: 0%;
+  }
+
+.backgroundDiv{
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(0.3px);
+    -webkit-backdrop-filter: blur(0.3px);
+    border-radius: 10px;
+    border:1px solid rgba(255, 255, 255, 0.18); 
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    
+}
+
+.backgroundDiv:hover
+{
+    background: rgba(255, 255, 255, 0.466);
+}
+

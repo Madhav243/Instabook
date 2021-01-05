@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">    
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <link rel="stylesheet" href="/public/css/signup.css">
+    <title>Instabook</title>
+</head>
+
+
+<body>
+   
+        <div class="backgroundDiv signup-form">
+            <img src="/public/image/final_logo.svg" alt="" style="width: 100px;
+            margin-top: 3%;">
+            <h1 class="logo-heading">InstaBook</h1>
+            <form onsubmit="return doRegister(this);">
+                <input type="text" required name="name" placeholder="Name">
+                <input type="text" required name="username" placeholder="Username">
+                <input type="email" required name="email" placeholder="Email">
+                <input type="password" required name="password" id="" placeholder="Password">
+                <button name="submit" type="submit" >
+                    <span>Sign Up</span></button>
+                   <h4 style="display: inline;">Already have an account? </h4> <a href="/login" style="padding-left: 8px;">Click here !</a>
+
+            </form>
+        </div>
+
+<script>
+function doRegister(form)
+{
+    form.submit.setAttribute("disabled","disabled");
+    form.submit.innerHTML="<span>Loading...</span>";
+
+    var ajax=new XMLHttpRequest();
+    ajax.open("POST","/signup",true);
+
+    ajax.onreadystatechange = function()
+    {
+        if (this.readyState==4 && this.status==200)
+        {
+            form.submit.removeAttribute("disabled");
+            form.submit.innerHTML="<span>Sign Up</span>";
+
+            var response = JSON.parse(this.responseText);
+            alert(response.message);
+
+            if(response.status=="success")
+            {
+                window.location.href="/login";
+            }
+            else if (response.status=="error")
+            {
+                window.location.href="/signup";
+            }
+        }
+    };
+    ajax.send(new FormData(form));
+    return false;
+
+
+}
+
+
+</script>
+
+
+    
+</body>
+</html>
