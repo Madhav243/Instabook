@@ -298,11 +298,12 @@ http.listen(3000, function() {
             });
         }
         else{
+          bcrypt.hash(password,10,function(error,hash){
           database.collection("users").findOneAndUpdate({
             "resetToken":token
           },{
             $set:{
-              "password":password
+              "password":hash
             }
           },function(error,data)
           {
@@ -313,7 +314,8 @@ http.listen(3000, function() {
               });
           }
           )
-        }
+        });
+      }
       }
     }
     
