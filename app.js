@@ -125,8 +125,8 @@ http.listen(3000, function() {
     //get home route
     app.get("/",function(req,res)
     {
-      res.redirect("/login");
-    
+      // res.redirect("/login");
+    res.redirect("/updateProfile");
     });
     //get home ended
 
@@ -327,6 +327,11 @@ http.listen(3000, function() {
   //post updatePassword ended
 
 
+
+  app.get("/updateProfile",function(request,result)
+  {
+    result.render("updateProfile");
+  });
 
 
 

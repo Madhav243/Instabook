@@ -1,0 +1,200 @@
+body, html {
+    height: 100%;
+    
+    background-image: url("/public/image/bg-image.png");
+    
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    text-align: center;
+    margin: 0%;
+  }
+
+
+  .backgroundDiv{
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(0.3px);
+    -webkit-backdrop-filter: blur(0.3px);
+    border-radius: 10px;
+    border:1px solid rgba(255, 255, 255, 0.18); 
+    z-index: 2;
+    
+}
+
+.backgroundDiv:hover
+{
+    background: rgba(255, 255, 255, 0.466);
+}
+
+
+*
+{
+    margin:0;
+}
+
+.container
+{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-content: center;
+    flex-direction: row;
+}
+
+
+.nav1{
+    width: 300px;
+    margin-left: 13%;
+    margin-top: 10px;
+    height: 75%;
+}
+
+.nav1,.items,.main
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name 
+{
+    font-size: 2rem;
+    background: linear-gradient(90deg, rgba(131,58,180,1) 20%, rgba(253,29,29,0.9895308465182948) 86%, rgba(252,176,69,1) 100%);   
+     -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+    font-family:'Pacifico', cursive; 
+    font-weight: lighter;
+}
+
+
+
+.nav1-items
+{
+    margin: 15px;
+    text-decoration: none;
+    color: black;
+}
+.nav1-items:hover
+{
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border-radius: 50px; 
+}
+
+.icon
+{
+    width: 30px;
+}
+
+
+.search
+{
+    align-content: center;
+    margin: 10px;
+    
+}
+
+.searchbox
+{
+    width: 200px;
+    height: 40px;
+    border-radius: 50px;
+    border-color: black;
+    background: transparent;
+    text-align: center;
+    font-size: 20px;
+    outline: none;
+}
+
+.searchbox:hover{
+    box-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+::placeholder
+{
+    color: black;
+    font-size: 20px;
+}
+
+.h2-mod
+{
+    display: inline;
+    padding-left: 10px;
+    font-size: 30px;
+}
+
+.main{
+    margin-left:4px;
+    margin-right: 4px;
+    height: 100%;
+    width:60%;
+}
+
+.sidebar
+{
+    width: 250px; 
+    position: absolute; 
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow:0 8px 32px 0 rgba(23, 27, 90, 0.747);
+    backdrop-filter: blur(10px); 
+    height: 60%; 
+    top: 3%; 
+    left:-250px; 
+    /* left: 0; */
+    border-radius: 10px;
+    transition: all 500ms linear;
+}
+
+.active
+{
+    left:10px;
+}
+
+.button
+{
+    position: absolute; 
+    left: 10px; 
+    top: 3%;
+    /* left:270px */
+    transition: all 500ms linear;
+}
+
+.active2
+{
+    left:270px;
+}
+
+
+@media only screen and (max-width: 768px) /* mobile */ 
+{
+    .nav1{
+        display: none;
+    }
+
+    .container{
+        justify-content: center;
+    }
+   
+    .main{
+        width:100%;
+    }
+    .main .brand-name
+    {
+        font-size: 1.5rem;
+    }
+}
+
+@media only screen and (min-width: 768px)  /* desktop */
+{
+    .nav2
+    {
+        display: none;
+    }
+    .main .brand-name
+    {
+        display: none;
+    }
+}
+
