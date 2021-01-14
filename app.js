@@ -14,9 +14,11 @@ var ejs = require("ejs");
 
 var http=require("http").createServer(app);
 var bcrypt=require("bcrypt");
+
 var fileSystem= require("fs");
 var jwt=require("jsonwebtoken");
 const { connect } = require("http2");
+
 var accessTokenSceret="ilovesocialmedia";
 
 var nodemailer= require("nodemailer");
@@ -43,6 +45,7 @@ var socketId="";
 var users=[];
 
 var mainURL="localhost:3000";
+//main url also in footer chnge while deploying
 
 socketIO.on("connection",function(socket)
 {
@@ -125,8 +128,8 @@ http.listen(3000, function() {
     //get home route
     app.get("/",function(req,res)
     {
-      // res.redirect("/login");
-    res.redirect("/updateProfile");
+       res.redirect("/login");
+      //res.redirect("/updateProfile");
     });
     //get home ended
 
@@ -327,15 +330,88 @@ http.listen(3000, function() {
   //post updatePassword ended
 
 
-
+  //get updateProfile started
   app.get("/updateProfile",function(request,result)
   {
     result.render("updateProfile");
   });
+  //get updateProfile ended
+
+  //getUser Post route ("Checking login session")  
+  app.post("/getUser",function(request,result)
+  {
+    var accessToken = request.fields.accessToken;
+    database.collection("users").findOne({
+      "accessToken" : accessToken
+    },function(error,user)
+    {
+      if (user==null)
+      {
+        result.json({
+          "status":"error",
+          "message":"User has been logged out. Please login again."
+        });
+      } else {
+        result.json({
+          "status":"success",
+          "message":"Record has been fetched",
+          "data":user
+        });
+      }
+    });
+  });
 
 
+  //post route for displaying image
+  app.post("/uploadProfileImage", function (request, result) {
+    var accessToken = request.fields.accessToken;
+    var profileImage = "";
 
+    database.collection("users").findOne({
+      "accessToken": accessToken
+    }, function (error, user) {
+      if (user == null) {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
 
+        if (request.files.profileImage.size > 0 && request.files.profileImage.type.includes("image")) {
+
+          if (user.profileImage != "") {
+            fileSystem.unlink(user.profileImage, function (error) {
+              //
+            });
+          }
+
+          profileImage = "public/images/" + new Date().getTime() + "-" + request.files.profileImage.name;
+          fileSystem.rename(request.files.profileImage.path, profileImage, function (error) {
+            //
+          });
+
+          database.collection("users").updateOne({
+            "accessToken": accessToken
+          }, {
+            $set: {
+              "profileImage": profileImage
+            }
+          }, function (error, data) {
+            result.json({
+              "status": "status",
+              "message": "Profile image has been updated.",
+              data: mainURL + "/" + profileImage
+            });
+          });
+        } else {
+          result.json({
+            "status": "error",
+            "message": "Please select valid image."
+          });
+        }
+      }
+    });
+  });
 
 
 

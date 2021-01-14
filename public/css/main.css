@@ -13,7 +13,7 @@ body, html {
   }
 
 
-  .backgroundDiv{
+.backgroundDiv{
     background: rgba(255, 255, 255, 0.25);
     box-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.37);
     backdrop-filter: blur(0.3px);
@@ -108,7 +108,8 @@ body, html {
     outline: none;
 }
 
-.searchbox:hover{
+.searchbox:hover
+{
     box-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
@@ -147,6 +148,11 @@ body, html {
     transition: all 500ms linear;
 }
 
+.icon2
+{
+    width: 35px;
+}
+
 .active
 {
     left:10px;
@@ -156,7 +162,7 @@ body, html {
 {
     position: absolute; 
     left: 10px; 
-    top: 3%;
+    top: 5%;
     /* left:270px */
     transition: all 500ms linear;
 }
@@ -165,6 +171,17 @@ body, html {
 {
     left:270px;
 }
+
+
+.heading
+{
+    margin: 2% auto;
+    font-family: 'Lobster', cursive;
+    font-size: 20px;
+}
+
+
+
 
 
 @media only screen and (max-width: 768px) /* mobile */ 
@@ -182,7 +199,7 @@ body, html {
     }
     .main .brand-name
     {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
 }
 

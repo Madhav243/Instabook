@@ -4,21 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/public/css/main.css">
+    <link rel="stylesheet" href="/public/css/updateProfile.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
     <title>InstaBook</title>
 </head>
 <body>
 <div class="container">
     <div class="nav1 backgroundDiv">
         <div class="brand-name">
-            <h1>InstaBook</h1>
+            <h1>Instabook</h1>
         </div>
         <div class="items">
             <a href="/home" class="nav1-items"> <span><img class="icon" src="/public/icons/home.svg" alt=""></span><h2 class="h2-mod">Home</h2></a>
             <a href="/messages" class="nav1-items"> <span><img class="icon" src="/public/icons/message.svg" alt=""></span><h2 class="h2-mod">Message</h2></a>
             <a href="/notifications" class="nav1-items"> <span><img class="icon" src="/public/icons/notification.svg" alt=""></span><h2 class="h2-mod">Notification</h2></a>
             <a href="/profile" class="nav1-items"> <span><img class="icon" src="/public/icons/profile.svg" alt=""></span><h2 class="h2-mod">Profile</h2></a>
+            <a href="/login" onclick="return doLogout();" class="nav1-items"> <span><img class="icon" src="/public/icons/logout.svg" alt=""></span><h2 class="h2-mod">Logout</h2></a>
+            
+            
             <div class="search">
                 <form onsubmit="return doSearch(this)">
                     <input type="text" class="searchbox" placeholder="Search"> 
