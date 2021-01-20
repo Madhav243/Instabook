@@ -1,0 +1,77 @@
+<%- include("partials/header") -%>
+
+<div class="heading">
+    <h1>Home</h1>
+</div>
+<div class="content">
+
+    <div class="backgroundDiv add-post-box" >
+        
+        <div class="profile-image-post">
+            <img id="profile-image-display" >
+        </div>
+        
+        <div class="post-upload-content">
+           
+                <form onsubmit="return doPost(this);" class="post-content">
+                    <input type="text" placeholder="Caption for your Post ! " style="display: block;
+                    margin:10px;
+                    width: 80%;
+                    background: transparent;
+                    border: none;
+                    outline: none;
+                    text-align:center;
+                    font-size: 20px;
+                    color: rgb(122, 121, 120);
+                    " >
+                    <div class="imag-video-display">
+
+                        <img style=" display: none; width: 300px; height: 300px;" >
+                    <video style="display: none;" ></video>
+
+                    </div>
+                    <div class="post-icons">
+                        <label >
+                            <img src="/public/icons/uploadImage.svg" alt="imageUpload" style="height: 30px; width: 30px; margin: 5px;">
+                            <input type="file" name="" id="" style="display: None;" accept="image/*" onchange= "previewPostImage();">
+                        </label>
+                        <label >
+                            <img src="/public/icons/uploadVideo.svg" alt="videoUpload" style="height: 30px; width: 30px; margin: 5px;">
+                            <input type="file" name="" id="" style="display: None;" accept="video/*" onchange= "previewPostVideo();">
+                        </label>
+                        
+                        <button type="submit" style="margin: 5px;
+                        width:50px;
+                        ">
+                            Post
+                        </button>
+    
+                    </div>
+                
+                </form>
+                
+
+           
+       
+
+        </div>
+        
+    </div>
+    
+
+</div>
+
+
+
+<script>
+
+window.onload = function()
+{
+    showaddPostProfile();
+}
+
+
+</script>
+
+
+<%- include("partials/footer") -%>

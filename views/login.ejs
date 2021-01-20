@@ -55,12 +55,12 @@ function doLogin(form)
             {
                 var accessToken = response.accessToken;
                 localStorage.setItem("accessToken",accessToken);
-                if(response.profileImage=="")
+                if(response.profileImage=="public/icons/user.svg")
                 {
                     window.location.href="/updateProfile";
                 }
                 else{
-                    window.location.href="/";
+                    window.location.href="/home";
                 }
             }
             else{

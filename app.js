@@ -45,7 +45,7 @@ var socketId="";
 var users=[];
 
 var mainURL="localhost:3000";
-//main url also in footer chnge while deploying
+//main url also in header chnge while deploying
 
 socketIO.on("connection",function(socket)
 {
@@ -95,7 +95,7 @@ http.listen(3000, function() {
               "email":email,
               "password":hash,
               "username":username,
-              "profileImage":"",
+              "profileImage":"public/icons/user.svg",
               "dob":"",
               "aboutMe":"",
               "follower":[],
@@ -337,6 +337,46 @@ http.listen(3000, function() {
   });
   //get updateProfile ended
 
+  //post updateProfile started
+  app.post("/updateProfile",function(request,result)
+  {
+    var accessToken = request.fields.accessToken;
+			var name = request.fields.name;
+      var dob = request.fields.dob;
+      var aboutMe = request.fields.aboutMe;
+
+      database.collection("users").findOne({"accessToken":accessToken},
+      function(error,user){
+        if (user == null) {
+					result.json({
+						"status": "error",
+						"message": "User has been logged out. Please login again."
+					});
+				} else {
+          database.collection("users").updateOne({
+						"accessToken": accessToken
+					}, {
+						$set: {
+							"name": name,
+							"dob": dob,
+							"aboutMe": aboutMe
+						}
+					}, function (error, data) {
+						result.json({
+							"status": "status",
+							"message": "Profile has been updated."
+						});
+					});
+
+        }
+
+      });
+
+
+
+  });
+  //post updateProfile ended
+
   //getUser Post route ("Checking login session")  
   app.post("/getUser",function(request,result)
   {
@@ -365,6 +405,7 @@ http.listen(3000, function() {
   //post route for displaying image
   app.post("/uploadProfileImage", function (request, result) {
     var accessToken = request.fields.accessToken;
+    
     var profileImage = "";
 
     database.collection("users").findOne({
@@ -379,17 +420,17 @@ http.listen(3000, function() {
 
         if (request.files.profileImage.size > 0 && request.files.profileImage.type.includes("image")) {
 
-          if (user.profileImage != "") {
+          if (user.profileImage != "public/icons/user.svg") {
             fileSystem.unlink(user.profileImage, function (error) {
               //
             });
           }
 
-          profileImage = "public/images/" + new Date().getTime() + "-" + request.files.profileImage.name;
+          profileImage = "public/image/" + new Date().getTime() + "-" + request.files.profileImage.name;
           fileSystem.rename(request.files.profileImage.path, profileImage, function (error) {
             //
           });
-
+          console.log(request.files.profileImage.path);
           database.collection("users").updateOne({
             "accessToken": accessToken
           }, {
@@ -400,7 +441,7 @@ http.listen(3000, function() {
             result.json({
               "status": "status",
               "message": "Profile image has been updated.",
-              data: mainURL + "/" + profileImage
+              "data": mainURL + "/" + profileImage
             });
           });
         } else {
@@ -413,7 +454,10 @@ http.listen(3000, function() {
     });
   });
 
-
+  //get home route
+  app.get("/home",function(req,res){
+    res.render("home");
+  });
 
 
 

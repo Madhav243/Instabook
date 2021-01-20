@@ -30,11 +30,14 @@ document.getElementById("tooglebutton").classList.toggle('active2');
 </script>
 
 <script src="/public/js/socket.io.js"></script>
+<script src="/public/js/jquery-3.3.1.min.js"></script>
+<script src="/public/js/main.min.js"></script>
 
 <script>
 
     window.user=null;
-    var socketIO = io("localhost:3000");
+
+    var socketIO = io(mainURL);
 
     function getUser()
     {
@@ -54,7 +57,14 @@ document.getElementById("tooglebutton").classList.toggle('active2');
                         alert(response.message);
                         localStorage.removeItem("accessToken");
                     }
-                    showProfileData(response.data);
+
+                    console.log(window.location.href);
+                    if(window.location.href==mainURL+"/updateProfile")
+                    {
+
+                        showProfileData(response.data);
+                    }
+                    
                 }
             };
             var formData = new FormData();
