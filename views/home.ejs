@@ -14,7 +14,8 @@
         <div class="post-upload-content">
            
                 <form onsubmit="return doPost(this);" class="post-content">
-                    <input type="text" placeholder="Caption for your Post ! " style="display: block;
+                    <input name="type" type="hidden" value="post">
+                    <input type="text" class="caption-area" placeholder="Caption for your Post ! " style="display: block;
                     margin:10px;
                     width: 80%;
                     background: transparent;
@@ -23,21 +24,21 @@
                     text-align:center;
                     font-size: 20px;
                     color: rgb(122, 121, 120);
-                    " >
+                    "  name="caption" autocomplete="off" maxlength="250" required>
                     <div class="imag-video-display">
 
-                        <img style=" display: none; width: 300px; height: 300px;" >
-                    <video style="display: none;" ></video>
+                        <img style=" display: none; width: 300px; height: 300px; outline: none;"  class="imag-display" >
+                        <video style="display: none; width: 300px; height: 300px; outline: none;"  controls class="video-display" ></video>
 
                     </div>
                     <div class="post-icons">
                         <label >
                             <img src="/public/icons/uploadImage.svg" alt="imageUpload" style="height: 30px; width: 30px; margin: 5px;">
-                            <input type="file" name="" id="" style="display: None;" accept="image/*" onchange= "previewPostImage();">
+                            <input type="file" name="image" id="image-post" style="display: None;" accept="image/*" onchange= "previewPostImage(this);">
                         </label>
                         <label >
                             <img src="/public/icons/uploadVideo.svg" alt="videoUpload" style="height: 30px; width: 30px; margin: 5px;">
-                            <input type="file" name="" id="" style="display: None;" accept="video/*" onchange= "previewPostVideo();">
+                            <input type="file" name="video" id="video-post" style="display: None;" accept="video/*" onchange= "previewPostVideo(this);">
                         </label>
                         
                         <button type="submit" style="margin: 5px;
@@ -57,6 +58,11 @@
         </div>
         
     </div>
+
+
+    <div id="newsFeed" >
+
+    </div>
     
 
 </div>
@@ -65,10 +71,214 @@
 
 <script>
 
-window.onload = function()
+function previewPostImage(self)
 {
-    showaddPostProfile();
+    var file = self.files;
+    if (file.length>0)
+    {
+        var fileReader= new FileReader();
+        fileReader.onload= function (event)
+        {   
+            document.getElementById("video-post").value="";
+            document.getElementsByClassName("video-display")[0].style.display="none";
+            document.getElementsByClassName("imag-display")[0].style.display="block";
+            document.getElementsByClassName("add-post-box")[0].style.height="500px";
+            document.getElementsByClassName("post-content")[0].style.height="450px";
+            document.getElementsByClassName("imag-display")[0].setAttribute("src",event.target.result);
+            document.getElementsByClassName("video-display")[0].setAttribute("src","");
+
+        }
+        fileReader.readAsDataURL(file[0]);
+    }
+
 }
+
+function previewPostVideo(self)
+{
+    var file=self.files;
+    if (file.length>0)
+    {
+        var fileReader= new FileReader();
+        fileReader.onload= function (event)
+        {   
+            document.getElementById("image-post").value="";
+            document.getElementsByClassName("imag-display")[0].style.display="none";
+            document.getElementsByClassName("video-display")[0].style.display="block";
+            document.getElementsByClassName("add-post-box")[0].style.height="500px";
+            document.getElementsByClassName("post-content")[0].style.height="450px";
+            document.getElementsByClassName("imag-display")[0].setAttribute("src","");
+            document.getElementsByClassName("video-display")[0].setAttribute("src",event.target.result);
+
+        }
+        fileReader.readAsDataURL(file[0]);
+    }
+
+}
+
+
+
+      
+function createLikesSection(data)
+     {
+         var isLiked = false;
+         for (var b = 0; b < data.likers.length; b++) {
+             var liker = data.likers[b];
+             if (liker._id == window.user._id) {
+                 isLiked = true;
+                 break;
+             }
+         }
+     
+         var html = "";
+         html+='<div class="like-comment" style="display: flex;flex-direction: row;align-content: space-evenly;justify-content: space-around;padding-top: 10px;">'
+             var className = "";
+             if (isLiked) {
+                 className = "like";
+             } else {
+                 className = "none";
+             }
+     
+        html+=' <span class="'+ className+'" onclick="toggleLikePost(this); " data-id="' + data._id + '" ><i class="ti-thumb-up" style="font-size: 30px;"></i>';
+        html+=' <ins style="font-size: 20px;">'+data.likers.length+'</ins></span>';
+         
+             html += '<span class="comment" title="Comments">';
+                 html+='<i class="ti-comments" style="font-size: 30px;"></i>';
+                 html+='<ins style="font-size: 20px;"  id="count-post-comments-' + data._id + '">' + data.comments.length + '</ins>';
+                 html+='</span>';
+     
+             html+='<span class="share" onclick="sharePost(this);" data-id="' + data._id + '">';
+                 html+='<i class="ti-share" style="font-size: 30px;"></i>';
+                 html+='<ins style="font-size: 20px;" >' + data.shares.length + '</ins>';
+                 html+=' </span></div>';
+         return html;            
+     
+     
+     }
+     
+function toggleLikePost(self)
+     {
+         var _id = self.getAttribute("data-id");
+         var ajax = new XMLHttpRequest();
+         ajax.open("POST", "/toggleLikePost", true);
+     
+         ajax.onreadystatechange = function(){
+             if (this.readyState == 4 && this.status == 200)
+             {
+                 var response = JSON.parse(this.responseText);
+     
+                 if (response.status == "success") {
+                     self.className = "like";
+     
+                     var likes = parseInt(self.querySelector("ins").innerHTML);
+                     likes++;
+                     self.querySelector("ins").innerHTML = likes;
+                     }
+                 if (response.status == "unliked") {
+                     self.className = "none";
+                     var likes = parseInt(self.querySelector("ins").innerHTML);
+                     likes--;
+                     self.querySelector("ins").innerHTML = likes;
+                     }
+                 if (response.status == "error") {
+                     alert(response.message);
+                     }
+             }
+     
+     
+         };
+     
+         var formData = new FormData();
+         formData.append("accessToken", localStorage.getItem("accessToken"));
+         formData.append("_id", _id);
+         ajax.send(formData);
+     
+     
+     }
+     
+function showNewsfeed()
+    {
+         var ajax = new XMLHttpRequest();
+         ajax.open("POST", "/getNewsfeed", true);
+     
+         ajax.onreadystatechange=function()
+         {
+             if(this.readyState == 4 && this.status == 200)
+             {
+                 var response = JSON.parse(this.responseText);
+                 var html = "";
+                     for (var a = 0; a < response.data.length; a++)
+                    {
+                        var data = response.data[a];
+     
+                        html+='<div class="backgroundDiv postCard">';
+                            html+='<div class="username-profileimage" >';
+                                html+='<label >';
+                                    html+='<a href="/user/'+data.user.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
+                                    html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + data.user.profileImage + '">';
+                                    html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.user.username+'</h3>';
+                                    var createdAt = new Date(data.createdAt);
+                                    var date = createdAt.getDate() + "";
+                                    date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();                         
+                                    html+='<h4 style="font-weight: lighter;">'+date+'</h4></label></a></label></div>';
+                                    html+='<div class="post-image-video" style="padding: 10px; border-bottom: 1px solid rgba(133, 130, 130, 0.486);">';
+                                    if (data.image != "") {
+                                        html+='<img src="' + mainURL + "/" + data.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
+                                    }
+                                    if (data.video != "") {
+                                        html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="' + mainURL + "/" + data.video + '"></video>';     
+                                    }
+                                        
+                                    html+='<div class="post-caption">'+ data.caption+'</div></div>';
+                                    html+=createLikesSection(data);
+                                    html+='</div>';
+                    }
+                     document.getElementById("newsFeed").innerHTML=html;
+             }
+         };
+         var formData = new FormData();
+         formData.append("accessToken", localStorage.getItem("accessToken"));
+         ajax.send(formData);
+    }
+     
+     
+
+function doPost(form)
+{
+    var ajax=new XMLHttpRequest();
+    ajax.open("POST","/addPost",true);
+    ajax.onreadystatechange = function()
+    {
+        if( this.readyState == 4 && this.status==200)
+        {
+            var response=JSON.parse(this.responseText);
+            alert(response.message);
+            if(response.status=="success")
+            {
+                document.getElementById("video-post").value="";
+                document.getElementById("image-post").value="";
+                document.getElementsByClassName("caption-area")[0].value="";
+                document.getElementsByClassName("add-post-box")[0].style.height="200px";
+                document.getElementsByClassName("post-content")[0].style.height="150px";
+                document.getElementsByClassName("imag-display")[0].style.display="none";
+                document.getElementsByClassName("video-display")[0].style.display="none";
+                document.getElementsByClassName("imag-display")[0].setAttribute("src","");
+                document.getElementsByClassName("video-display")[0].setAttribute("src","");
+
+
+
+            }
+
+        }
+    };
+    var formData =new FormData(form);
+    formData.append("accessToken",localStorage.getItem("accessToken"));
+    ajax.send(formData);
+    return false;
+}
+
+
+
+
 
 
 </script>

@@ -3,17 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/public/css/main.css">
+    <link rel="stylesheet" href="/public/css/main.css"> 
+    <link rel="stylesheet" href="/public/css/themify-icons.css">
     <link rel="stylesheet" href="/public/css/home.css">
     <link rel="stylesheet" href="/public/css/updateProfile.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
-   <script>var mainURL="http://localhost:3000";
-</script> 
+   
+    
     <title>InstaBook</title>
 </head>
 <body>
+    <%
+		months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	%>
+
+    <%
+			mainURL = "http://localhost:3000";
+    %>
+    
+    <script>
+   
+   
+        var mainURL="http://localhost:3000";
+     
+        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        function showaddPostProfile(user){
+            document.getElementById("profile-image-display").setAttribute("src",mainURL + "/" + user.profileImage);
+}
+     
+     </script>
+
+
+
+
 <div class="container">
     <div class="nav1 backgroundDiv">
         <div class="brand-name">

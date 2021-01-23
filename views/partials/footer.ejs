@@ -19,8 +19,11 @@
     
     
 </div>  
+
 </div>
+
 </div>
+
 <script>
 function toogle()
 {
@@ -36,7 +39,7 @@ document.getElementById("tooglebutton").classList.toggle('active2');
 <script>
 
     window.user=null;
-
+    var mainURL = "http://localhost:3000";
     var socketIO = io(mainURL);
 
     function getUser()
@@ -51,19 +54,24 @@ document.getElementById("tooglebutton").classList.toggle('active2');
                 if (this.readyState == 4 && this.status == 200)
                 {
                     var response=JSON.parse(this.responseText);
+                    window.user = response.data;
 
                     if(response.status !="success")
                     {
                         alert(response.message);
                         localStorage.removeItem("accessToken");
                     }
-
-                    console.log(window.location.href);
-                    if(window.location.href==mainURL+"/updateProfile")
+                    if(window.location.href== mainURL+"/updateProfile")
                     {
-
                         showProfileData(response.data);
                     }
+                    if(window.location.href==mainURL+"/home")
+                    {
+                        showaddPostProfile(response.data);
+                        showNewsfeed();
+                    }
+                    
+
                     
                 }
             };

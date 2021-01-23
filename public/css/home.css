@@ -54,3 +54,46 @@ align-items: flex-end;
     display: flex;
     justify-content: center;
 }
+
+
+.postCard{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* height: 525px; */
+    /* height: 200px; */
+    /* if no img and video  */
+    margin: 2px 0;
+}
+
+.username-profileimage
+{
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(133, 130, 130, 0.486);
+    
+
+}
+
+
+.like
+{
+    color: rgba(217, 226, 217, 0.801);
+    cursor: pointer;
+    transition: all 0.2s linear 0s;
+}
+.none
+{
+    color: black;
+    cursor: pointer;
+    transition: all 0.2s linear 0s;
+}
+
+@media only screen and (max-width: 768px) /* mobile */ 
+{
+    .postCard
+    {
+        /* height: 550px; */
+    }
+
+}

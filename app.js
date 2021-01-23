@@ -8,7 +8,7 @@ require('dotenv').config()
 
 var mongodb= require("mongodb");
 var mongoClient=mongodb.MongoClient;
-var ObjectID=mongodb.ObjectId;
+var ObjectId=mongodb.ObjectId;
 
 var ejs = require("ejs");
 
@@ -45,7 +45,7 @@ var socketId="";
 var users=[];
 
 var mainURL="localhost:3000";
-//main url also in header chnge while deploying
+//main url also in header chnge  and footer alsowhile deploying
 
 socketIO.on("connection",function(socket)
 {
@@ -98,8 +98,7 @@ http.listen(3000, function() {
               "profileImage":"public/icons/user.svg",
               "dob":"",
               "aboutMe":"",
-              "follower":[],
-              "following":[],
+              "friends": [],
               "notifications":[],
               "posts":[],
               "resetToken":"",
@@ -458,6 +457,261 @@ http.listen(3000, function() {
   app.get("/home",function(req,res){
     res.render("home");
   });
+
+
+
+  //post route to addPost
+  app.post("/addPost",function(request,result)
+  {
+    var accessToken=request.fields.accessToken;
+    var caption=request.fields.caption;
+    var image="";
+    var video="";
+    var type=request.fields.type;
+    var createdAt=new Date().getTime();
+    var _id=request.fields._id;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,user)
+    {
+      if (user == null) {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        if (request.files.image.size > 0 && request.files.image.type.includes("image")) {
+          image = "public/image/" + new Date().getTime() + "-" + request.files.image.name;
+          fileSystem.rename(request.files.image.path, image, function (error) {
+            //
+          });
+        }
+
+        if (request.files.video.size > 0 && request.files.video.type.includes("video")) {
+          video = "public/videos/" + new Date().getTime() + "-" + request.files.video.name;
+          fileSystem.rename(request.files.video.path, video, function (error) {
+            //
+          });
+        }
+
+        database.collection("posts").insertOne({
+          "caption": caption,
+          "image": image,
+          "video": video,
+          "type": type,
+          "createdAt": createdAt,
+          "likers": [],
+          "comments": [],
+          "shares": [],
+          "user": {
+            "_id": user._id,
+            "name": user.name,
+            "username": user.username,
+            "profileImage": user.profileImage
+          }
+        }, function (error, data) {
+
+          database.collection("users").updateOne({
+            "accessToken": accessToken
+          }, {
+            $push: {
+              "posts": {
+                "_id": data.insertedId,
+                "caption": caption,
+                "image": image,
+                "video": video,
+                "type": type,
+                "createdAt": createdAt,
+                "likers": [],
+                "comments": [],
+                "shares": []
+              }
+            }
+          }, function (error, data) {
+
+            result.json({
+              "status": "success",
+              "message": "Post has been uploaded."
+            });
+          });
+        });
+
+
+      }
+
+
+    });
+
+  });
+
+
+
+  app.post("/getNewsfeed",function(request,result){
+    var accessToken = request.fields.accessToken;
+    database.collection("users").findOne({
+      "accessToken": accessToken
+    },function(error,user){
+      if (user == null) {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        var ids = [];
+        ids.push(user._id);
+        database.collection("posts")
+					.find({
+						"user._id": {
+							$in: ids
+						}
+					})
+					.sort({
+						"createdAt": -1
+					})
+					.limit(5)
+					.toArray(function (error, data) {
+
+						result.json({
+							"status": "success",
+							"message": "Record has been fetched",
+							"data": data
+						});
+					});  
+      }
+    });
+  });
+
+  app.post("/toggleLikePost", function (request, result) {
+
+    var accessToken = request.fields.accessToken;
+    var _id = request.fields._id;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,user){
+      if(user==null)
+      {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        database.collection("posts").findOne({
+          "_id": ObjectId(_id)
+        },function(error,post){
+          if(post==null)
+          {
+            result.json({
+              "status": "error",
+              "message": "Post does not exist."
+            });
+          } else {
+            var isLiked = false;
+							for (var a = 0; a < post.likers.length; a++) {
+								var liker = post.likers[a];
+
+								if (liker._id.toString() == user._id.toString()) {
+									isLiked = true;
+									break;
+								}
+              }
+              
+              if(isLiked)
+              {
+                database.collection("posts").updateOne({
+									"_id": ObjectId(_id)
+								}, {
+									$pull: {
+										"likers": {
+											"_id": user._id,
+										}
+									}
+								}, function (error, data) {
+
+									database.collection("users").updateOne({
+										$and: [{
+											"_id": post.user._id
+										}, {
+											"posts._id": post._id
+										}]
+									}, {
+										$pull: {
+											"posts.$[].likers": {
+												"_id": user._id,
+											}
+										}
+									});
+
+									result.json({
+										"status": "unliked",
+										"message": "Post has been unliked."
+									});
+								});
+              } else {
+                database.collection("users").updateOne({
+									"_id": post.user._id
+								}, {
+									$push: {
+										"notifications": {
+											"_id": ObjectId(),
+											"type": "photo_liked",
+											"content": user.name + " has liked your post.",
+											"profileImage": user.profileImage,
+											"isRead": false,
+											"post": {
+												"_id": post._id
+											},
+											"createdAt": new Date().getTime()
+										}
+									}
+                });
+                
+                database.collection("posts").updateOne({
+									"_id": ObjectId(_id)
+								}, {
+									$push: {
+										"likers": {
+											"_id": user._id,
+											"name": user.name,
+											"profileImage": user.profileImage
+										}
+									}
+								}, function (error, data) {
+
+									database.collection("users").updateOne({
+										$and: [{
+											"_id": post.user._id
+										}, {
+											"posts._id": post._id
+										}]
+									}, {
+										$push: {
+											"posts.$[].likers": {
+												"_id": user._id,
+												"name": user.name,
+												"profileImage": user.profileImage
+											}
+										}
+									});
+
+									result.json({
+										"status": "success",
+										"message": "Post has been liked."
+									});
+								});
+
+              }
+
+          }
+
+        });
+
+      }
+    });
+
+  });
+
 
 
 
