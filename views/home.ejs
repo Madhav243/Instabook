@@ -194,11 +194,141 @@ function toggleLikePost(self)
      
      
      }
-     
+   
+function createCommentsSection(data)
+{
+    var html="";
+    html+='<div class="comment-section" >';
+        html+='<div class="comment-input" ">';
+            html+='<a href="/user/'+ window.user.username +'" style="display: flex; align-items: center; color:black; text-decoration: none;">';
+                html+='<img src="' + mainURL + '/' + window.user.profileImage + '" class="comment-input-image" >';
+                html+='<label  class="comment-input-username" ><h4>'+ window.user.username+'</h4> </label></a>';
+                html+='<form method="post" onsubmit="return doPostComment(this);" class="comment-input-form">';
+                    html += '<input type="hidden" name="_id" value="' + data._id + '">';
+                    html += '<textarea class="comment-textarea" name="comment" placeholder="Post your comment" cols="20" rows="2"></textarea>';
+                    html += '<button type="submit" style="width: 80px">Comment</button>';
+                    html+='</form></div>';
+                    html+='<div class="scroll-bar">'
+                   
+                        data.comments = data.comments.reverse();
+                        for (var b = 0; b <data.comments.length; b++)
+                        {
+                            var comment = data.comments[b];
+                            html+='<div class="comment-display">';
+                            html+='<div class="user-details">';
+                                html+='<a href="/user/'+comment.user.username+'" style="display: flex; align-items: center; color:black; text-decoration: none;">';
+                                    html+='<img src="'+mainURL + '/' + comment.user.profileImage +'" style="width: 60px; height:60px;border-radius: 100%; margin: 10px; " >';
+                                    html+='<label  style="margin-left: 10px; margin-right: 10px;"><h4>'+comment.user.username+'</h4></label>';
+                                    var createdAt = new Date(comment.createdAt);
+									var date = createdAt.getDate() + "";
+									date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();
+                                    html += '<span>' + date + '</span>';
+                                    html += '<a class="we-reply" href="javascript:void(0);" style="color:black; text-decoration: none; margin-left:10px; font-size: larger; " data-post-id="' + data._id + '" data-comment-id="' + comment._id + '" onclick="prepareToReply(this);" title="Reply"><i class="ti-control-backward"></i></a>';
+                                    html+='</div>';
+                                    html+='<div class="user-comment" >';
+                                        html+=comment.comment;
+                                        html+='</div>';
+                                        comment.replies = comment.replies.reverse();
+                                        for (var c = 0; c < comment.replies.length; c++)
+                                        {
+                                            var reply = comment.replies[c];
+                                            html+='<div class="reply-display" >';
+                                                html+='<div class="user-details" >';
+                                                    html+='<a href="/user/'+reply.user.username +'" style="display: flex; align-items: center;color:black; text-decoration: none;" >';
+                                                        html+='<img src="' + mainURL + '/' + reply.user.profileImage + '" style="width: 50px;height:50px; border-radius: 100%;margin-right: 10px;" >';
+                                                        html+='<label  style="margin-left: 10px; margin-right: 10px;"><h4>'+ reply.user.username+'</h4> </label>';
+                                                        var createdAt = new Date(reply.createdAt);
+												var date = createdAt.getDate() + "";
+                                                date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();
+                                                html += '<span>' + date + '</span>';
+                                                html+=' </a></div>';
+                                                html+='<div class="user-comment" >';
+                                                html+=reply.reply;
+                                                    html += '</div></div>';
+
+
+                                        }
+
+                                        html+='</div>';
+                        }
+                        html+='</div>';
+                        html+='</div>';
+                    return html;
+}
+
+
+
+function doPostComment(form)
+{
+    var ajax = new XMLHttpRequest();
+    ajax.open("POST", "/postComment",true);
+
+    ajax.onreadystatechange = function()
+    {
+        if (this.readyState == 4 && this.status == 200) {
+
+            var response = JSON.parse(this.responseText);
+            alert(response.message);
+
+            if (response.status == "success") {
+                form.comment.value = "";
+
+                var commentsHtml = createCommentsSection(response.updatePost);
+                document.getElementById("post-comments-" + form._id.value).innerHTML = commentsHtml;
+
+                var comments = parseInt(document.getElementById("count-post-comments-" + form._id.value).innerHTML);
+                comments++;
+                document.getElementById("count-post-comments-" + form._id.value).innerHTML = comments;
+            }
+        }
+
+    };
+    var formData = new FormData(form);
+    formData.append("accessToken", localStorage.getItem("accessToken"));
+    ajax.send(formData);
+
+    return false;
+}
+
+function prepareToReply(self) {
+    $("#replyModal input[name='postId']").val(self.getAttribute("data-post-id"));
+    $("#replyModal input[name='commentId']").val(self.getAttribute("data-comment-id"));
+    $("#replyModal").modal("show");
+}
+
+function doPostReply(form) {
+    var ajax = new XMLHttpRequest();
+    ajax.open("POST", "/postReply",true);
+
+    ajax.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+            var response = JSON.parse(this.responseText);
+            alert(response.message);
+
+            if (response.status == "success") {
+                form.reply.value = "";
+                $("#replyModal").modal("hide");
+
+                var commentsHtml = createCommentsSection(response.updatePost);
+                document.getElementById("post-comments-" + form.postId.value).innerHTML = commentsHtml;
+            }
+        }
+    };
+
+    var formData = new FormData(form);
+    formData.append("accessToken", localStorage.getItem("accessToken"));
+    ajax.send(formData);
+
+    return false;
+			}
+
+
+
 function showNewsfeed()
     {
          var ajax = new XMLHttpRequest();
-         ajax.open("POST", "/getNewsfeed", true);
+         ajax.open("POST", "/getNewsfeed",true);
      
          ajax.onreadystatechange=function()
          {
@@ -230,6 +360,9 @@ function showNewsfeed()
                                         
                                     html+='<div class="post-caption">'+ data.caption+'</div></div>';
                                     html+=createLikesSection(data);
+                                    html += "<div id='post-comments-" + data._id + "'>";
+                                    html += createCommentsSection(data);
+							        html += "</div>";
                                     html+='</div>';
                     }
                      document.getElementById("newsFeed").innerHTML=html;
@@ -240,8 +373,6 @@ function showNewsfeed()
          ajax.send(formData);
     }
      
-     
-
 function doPost(form)
 {
     var ajax=new XMLHttpRequest();

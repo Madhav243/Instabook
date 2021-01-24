@@ -68,7 +68,7 @@
         form.submit.setAttribute("disabled", "disabled");
 		form.submit.innerHTML = "<span>Loading...</span>";
 		var ajax = new XMLHttpRequest();
-		ajax.open("POST", "/updateProfile", true);
+		ajax.open("POST", "/updateProfile",true);
 		ajax.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
 
