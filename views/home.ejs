@@ -155,6 +155,8 @@ function createLikesSection(data)
      
      }
      
+
+
 function toggleLikePost(self)
      {
          var _id = self.getAttribute("data-id");
@@ -217,7 +219,8 @@ function createCommentsSection(data)
                             html+='<div class="comment-display">';
                             html+='<div class="user-details">';
                                 html+='<a href="/user/'+comment.user.username+'" style="display: flex; align-items: center; color:black; text-decoration: none;">';
-                                    html+='<img src="'+mainURL + '/' + comment.user.profileImage +'" style="width: 60px; height:60px;border-radius: 100%; margin: 10px; " >';
+                                    var proImage=getProfileImage(comment.user._id);
+                                    html+='<img src="'+mainURL + '/' + proImage +'" style="width: 60px; height:60px;border-radius: 100%; margin: 10px; " >';
                                     html+='<label  style="margin-left: 10px; margin-right: 10px;"><h4>'+comment.user.username+'</h4></label>';
                                     var createdAt = new Date(comment.createdAt);
 									var date = createdAt.getDate() + "";
@@ -235,7 +238,8 @@ function createCommentsSection(data)
                                             html+='<div class="reply-display" >';
                                                 html+='<div class="user-details" >';
                                                     html+='<a href="/user/'+reply.user.username +'" style="display: flex; align-items: center;color:black; text-decoration: none;" >';
-                                                        html+='<img src="' + mainURL + '/' + reply.user.profileImage + '" style="width: 50px;height:50px; border-radius: 100%;margin-right: 10px;" >';
+                                                        var proImage=getProfileImage(reply.user._id);
+                                                        html+='<img src="' + mainURL + '/' + proImage + '" style="width: 50px;height:50px; border-radius: 100%;margin-right: 10px;" >';
                                                         html+='<label  style="margin-left: 10px; margin-right: 10px;"><h4>'+ reply.user.username+'</h4> </label>';
                                                         var createdAt = new Date(reply.createdAt);
 												var date = createdAt.getDate() + "";
@@ -256,7 +260,31 @@ function createCommentsSection(data)
                     return html;
 }
 
-
+function sharePost(self){
+    if (confirm("Are you sure you want to share this post ?")){
+        var _id = self.getAttribute("data-id");
+		var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/sharePost", true);
+        ajax.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200){
+                var response = JSON.parse(this.responseText);
+                alert(response.message);
+                if (response.status == "success"){
+                    self.className = "like";
+                    var shares = parseInt(self.querySelector("ins").innerHTML);
+                    shares++;
+                    self.querySelector("ins").innerHTML = shares;
+                    showNewsfeed();
+                }
+            }
+        };
+        var formData = new FormData();
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        formData.append("_id", _id);
+        ajax.send(formData);
+    
+    }
+}
 
 function doPostComment(form)
 {
@@ -323,7 +351,59 @@ function doPostReply(form) {
     return false;
 			}
 
+function deletePost(self)
+{
+    if (confirm("Are you sure you want to delete this post ?")){
+        var _id = self.getAttribute("data-id");
+		var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/deletePost", true);
+        ajax.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200){
+                var response = JSON.parse(this.responseText);
+                alert(response.message);
+                if (response.status == "success"){
+                    showNewsfeed();
+                }
 
+
+            }
+        };
+        var formData = new FormData();
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        formData.append("_id", _id);
+        ajax.send(formData);
+    }
+}
+
+function getProfileImage(id)
+{
+    var ajax = new XMLHttpRequest();
+    var imageAddress="";
+    ajax.open("POST","/getprofileImage",true)
+    ajax.onreadystatechange=function()
+    {
+        if (this.readyState == 4 && this.status == 200)
+        {
+            var response=JSON.parse(this.responseText);
+            
+            if (response.status == "success"){
+                
+               imageAddress = response.profileimage;
+                
+                console.log("in IF block = "+imageAddress);
+                return imageAddress;
+                }
+            
+        }
+
+    };
+    var formData = new FormData();
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        formData.append("userid",id);
+        ajax.send(formData);
+
+    
+}
 
 function showNewsfeed()
     {
@@ -344,12 +424,21 @@ function showNewsfeed()
                             html+='<div class="username-profileimage" >';
                                 html+='<label >';
                                     html+='<a href="/user/'+data.user.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
-                                    html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + data.user.profileImage + '">';
+                                        var proImage=getProfileImage(data.user._id);
+                                        //console.log(proImage);
+                                    html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
                                     html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.user.username+'</h3>';
                                     var createdAt = new Date(data.createdAt);
                                     var date = createdAt.getDate() + "";
                                     date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();                         
-                                    html+='<h4 style="font-weight: lighter;">'+date+'</h4></label></a></label></div>';
+                                    html+='<h4 style="font-weight: lighter;">'+date+'</h4></label></a></label>';
+                                    if(data.user.username==window.user.username)
+                                    {
+                                        html+='<span class="delete" onclick="deletePost(this);" data-id="' + data._id + '">';
+                                            html+='<i class="ti-trash" style="font-size: 30px;"></i>';
+                                            html+='</span>';
+                                    }
+                                    html+='</div>';
                                     html+='<div class="post-image-video" style="padding: 10px; border-bottom: 1px solid rgba(133, 130, 130, 0.486);">';
                                     if (data.image != "") {
                                         html+='<img src="' + mainURL + "/" + data.image + '" style="height: 300px; width: 300px; padding: 10px; ">';

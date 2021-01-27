@@ -77,6 +77,8 @@ align-items: flex-end;
 {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
     border-bottom: 1px solid rgba(133, 130, 130, 0.486);
     
 
@@ -96,7 +98,9 @@ align-items: flex-end;
     transition: all 0.2s linear 0s;
 }
 
-
+.delete{
+    margin-right: 30px;
+}
 
 /* comment area */
 

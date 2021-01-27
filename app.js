@@ -429,7 +429,7 @@ http.listen(3000, function() {
           fileSystem.rename(request.files.profileImage.path, profileImage, function (error) {
             //
           });
-          console.log(request.files.profileImage.path);
+          
           database.collection("users").updateOne({
             "accessToken": accessToken
           }, {
@@ -508,7 +508,7 @@ http.listen(3000, function() {
             "_id": user._id,
             "name": user.name,
             "username": user.username,
-            "profileImage": user.profileImage
+            
           }
         }, function (error, data) {
 
@@ -657,7 +657,7 @@ http.listen(3000, function() {
 											"_id": ObjectId(),
 											"type": "photo_liked",
 											"content": user.name + " has liked your post.",
-											"profileImage": user.profileImage,
+											
 											"isRead": false,
 											"post": {
 												"_id": post._id
@@ -674,7 +674,7 @@ http.listen(3000, function() {
 										"likers": {
 											"_id": user._id,
 											"name": user.name,
-											"profileImage": user.profileImage
+											
 										}
 									}
 								}, function (error, data) {
@@ -690,7 +690,7 @@ http.listen(3000, function() {
 											"posts.$[].likers": {
 												"_id": user._id,
 												"name": user.name,
-												"profileImage": user.profileImage
+												
 											}
 										}
 									});
@@ -751,7 +751,7 @@ http.listen(3000, function() {
 											"_id": user._id,
                       "name": user.name,
                       "username":user.username,
-											"profileImage": user.profileImage,
+											
 										},
 										"comment": comment,
 										"createdAt": createdAt,
@@ -770,7 +770,7 @@ http.listen(3000, function() {
 												"type": "new_comment",
                         "content": user.name + " commented on your post.",
                         "username":user.username,
-												"profileImage": user.profileImage,
+												
 												"post": {
 													"_id": post._id
 												},
@@ -795,7 +795,7 @@ http.listen(3000, function() {
                         "_id": user._id,
                         "username":user.username,
 												"name": user.name,
-												"profileImage": user.profileImage,
+												
 											},
 											"comment": comment,
 											"createdAt": createdAt,
@@ -865,7 +865,7 @@ http.listen(3000, function() {
                       "_id": user._id,
                       "username":user.username,
 											"name": user.name,
-											"profileImage": user.profileImage,
+											
 										},
 										"reply": reply,
 										"createdAt": createdAt
@@ -889,7 +889,7 @@ http.listen(3000, function() {
                         "_id": user._id,
                         "username":user.username,
 												"name": user.name,
-												"profileImage": user.profileImage,
+												
 											},
 											"reply": reply,
 											"createdAt": createdAt
@@ -916,6 +916,190 @@ http.listen(3000, function() {
 
   });
 
+  app.post("/sharePost",function(request,result){
+
+    var accessToken = request.fields.accessToken;
+		var _id = request.fields._id;
+		var type = "shared";
+    var createdAt = new Date().getTime();
+
+    database.collection("users").findOne({
+      "accessToken": accessToken
+    },function(error,user){
+      if (user == null) {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        database.collection("posts").findOne({
+          "_id": ObjectId(_id)
+        },function(error,post){
+          if (post == null) {
+            result.json({
+              "status": "error",
+              "message": "Post does not exist."
+            });
+          } else {
+            database.collection("posts").updateOne({
+              "_id": ObjectId(_id)
+            },{
+              $push: {
+                "shares": {
+                  "_id": user._id,
+                  "name": user.name,
+                  "username":user.username,
+                  
+                }
+              }
+            },function(error,data){
+              database.collection("posts").insertOne({"caption": post.caption,
+              "image": post.image,
+              "video": post.video,
+              "type": type,
+              "createdAt": createdAt,
+              "likers": [],
+              "comments": [],
+              "shares": [],
+              "user": {
+                "_id": user._id,
+                "name": user.name,
+                "username":user.username,
+                
+              }},function(error,data){
+                database.collection("users").updateOne({
+                  $and: [{
+                    "_id": post.user._id
+                  }, {
+                    "posts._id": post._id
+                  }]
+                }, {
+                  $push: {
+                    "posts.$[].shares": {
+                      "_id": user._id,
+                      "name": user.name,
+                      "username": user.username,
+                      
+                    }
+                  }
+                });
+
+                result.json({
+                  "status": "success",
+                  "message": "Post has been shared."
+                });
+              });
+            });
+          }
+        });
+      }
+
+
+    });
+    
+    
+  });
+
+
+  app.post("/getProfileImage",function(request,result){
+    var accessToken = request.fields.accessToken;
+    var id = request.fields.userid;
+
+    database.collection("users").findOne({
+      "accessToken": accessToken
+    },function(error,user){
+      if (user == null) {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        database.collection("users").findOne({
+          "_id":ObjectId(id)
+        },function(error,user3){
+          if (user3 == null) {
+            result.json({
+              "status": "error",
+              "message": "User profile not found"
+            });
+          } else {
+            result.json({
+              "status": "success",
+              "profileimage":user3.profileImage
+            }); 
+          }
+        });
+      }
+
+      
+
+    });
+    
+  });
+
+
+  app.post("/deletePost",function(request,result){
+    var accessToken = request.fields.accessToken;
+    var _id = request.fields._id;
+    
+    database.collection("users").findOne({
+      "accessToken": accessToken
+    },function(error,user){
+      if (user == null) {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        database.collection("posts").findOne({
+          "_id": ObjectId(_id)
+        },function(error,post){
+          if (post == null) {
+            result.json({
+              "status": "error",
+              "message": "Post does not exist."
+            });
+          } else {
+            if(post.image !="")
+            {
+              fileSystem.unlink(post.image,function(error){//
+              });
+            }
+            if(post.video != "")
+            {
+              fileSystem.unlink(post.video,function(error){
+                //
+              });
+            }
+            database.collection("posts").deleteOne({
+              "_id": ObjectId(_id)
+            },function(error,data){
+              database.collection("users").updateOne({
+                $and: [{
+                  "_id": post.user._id
+                }, {
+                  "posts._id": post._id
+                }]
+              },{
+                $pull: {
+                  "posts": {
+                    "_id": post._id,
+                  }
+                }
+              });
+              result.json({
+                "status": "success",
+                "message": "Post has been deleted."
+              });
+            });
+          }
+
+        });
+      }
+      
+    });
+
+  });
 
 
 
