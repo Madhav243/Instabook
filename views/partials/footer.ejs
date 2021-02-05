@@ -7,8 +7,11 @@
             <a href="/login" onclick="return doLogout();" class="nav1-items"> <span><img class="icon" src="/public/icons/logout.svg" alt=""></span><h2 class="h2-mod">Logout</h2></a>
 
             <div class="search">
-                <form onsubmit="return doSearch(this)">
-                    <input type="text" class="searchbox" placeholder="Search"> 
+                <form class="searchbox" onsubmit="return false">
+                    <input type="text" class="input-searchbox" placeholder="Search" autocomplete="off"> 
+                    <button class="ti-search" style="background: transparent;width: auto;display: inline;color: black;font-size: x-large;font-weight: 600; margin:0; outline: none;"
+                    type="button" onclick="onSearch(this);"
+                    ></button>
                 </form>
 
             </div>
@@ -59,66 +62,15 @@ document.getElementById("tooglebutton").classList.toggle('active2');
 <script src="/public/js/socket.io.js"></script>
 <script src="/public/js/jquery-3.3.1.min.js"></script>
 <script src="/public/js/main.min.js"></script>
+<script src="/public/js/main.js"></script>
 
 <script>
 
-    window.user=null;
+  
     var mainURL = "http://localhost:3000";
     var socketIO = io(mainURL);
 
-    function getUser()
-    {
-        if(localStorage.getItem("accessToken"))
-        {
-            var ajax=new XMLHttpRequest();
-            ajax.open("POST","/getUser",true);
-
-            ajax.onreadystatechange = function()
-            {
-                if (this.readyState == 4 && this.status == 200)
-                {
-                    var response=JSON.parse(this.responseText);
-                    window.user = response.data;
-
-                    if(response.status !="success")
-                    {
-                        alert(response.message);
-                        localStorage.removeItem("accessToken");
-                    }
-                    if(window.location.href== mainURL+"/updateProfile")
-                    {
-                        showProfileData(response.data);
-                    }
-                    if(window.location.href==mainURL+"/home")
-                    {
-                        showaddPostProfile(response.data);
-                        showNewsfeed();
-                    }
-
-
-                    
-                }
-            };
-            var formData = new FormData();
-            formData.append("accessToken",localStorage.getItem("accessToken"));
-            ajax.send(formData);
-        } else{
-            window.location.href=("/login");
-            alert("Please login first !");
-            
-        }
-    }
-
-
     
-
-    function doLogout()
-    {
-        localStorage.removeItem("accessToken");
-        alert("User has been logged out !");
-        return true;
-    }
-
     window.onload = function()
     {
         getUser();

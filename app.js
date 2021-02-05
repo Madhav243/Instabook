@@ -27,7 +27,7 @@ var sendgridTransport = require("nodemailer-sendgrid-transport");
 const transporter = nodemailer.createTransport(sendgridTransport({
   auth:
   {
-    api_key:process.env.SENDGRID_API_KEY
+    api_key: process.env.SENDGRID_API_KEY
   }
   
 })
@@ -1100,6 +1100,111 @@ http.listen(3000, function() {
     });
 
   });
+
+
+
+  app.get("/search/:query",function(request,result){
+
+    var query=request.params.query;
+    result.render("search",{"query":query});
+  });
+
+
+  app.post("/search", function (request, result) {
+    var query = request.fields.query;
+    database.collection("users").find({
+      "name": {
+        $regex: ".*" + query + ".*",
+        $options: "i"
+      }
+    }).toArray(function (error, data) {
+
+      result.json({
+        "status": "success",
+        "message": "Record has been fetched",
+        "data": data
+      });
+    });
+  });
+
+
+
+  app.post("/sendFriendRequest",function(request,result){
+    var accessToken=request.fields.accessToken;
+    var _id=request.fields._id;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,user){
+      if(user==null)
+      {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        var me=user;
+        database.collection("users").findOne({
+          "_id":ObjectId(_id)
+        },function(error,user){
+          if(user == null)
+          {
+            result.json({
+              "status": "error",
+              "message": "User does not exist. "
+            });
+
+          } else {
+            database.collection("users").updateOne({
+              "_id":ObjectId(_id)
+            },{
+              $push:{
+                "friends":{
+                  "_id":me._id,
+                  "name":me.name,
+                  "username":me.username,
+                  "status":"Pending",
+                  "sentByMe": false,
+                  "inbox":[]
+                }
+              }
+            },function(error,data){
+              database.collection("users").updateOne({
+                "_id":me._id
+              },{
+                $push:{
+                  "friends":{
+                    "_id":user._id,
+                    "name":user.name,
+                    "username":user.username,
+                    "status":"Pending",
+                    "sentByMe": true,
+                    "inbox":[]
+                  }
+                }
+
+              },function(error,data){
+                result.json({
+                  "status": "success",
+                  "message": "Friend request Sent !"
+                });
+              });
+
+            });
+          }
+        });
+      }
+    });
+
+
+  });
+
+
+  app.get("/friends",function(req,res){
+    res.render("friends");
+  });
+
+
 
 
 

@@ -1,0 +1,9 @@
+.unfriend-button
+{
+    border: 2px solid black; 
+    width: 75px; 
+    background: transparent; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    margin: 30px;
+}

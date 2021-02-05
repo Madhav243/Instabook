@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/public/image/final_logo.svg" type="image/x-icon">
     <link rel="stylesheet" href="/public/css/main.css"> 
     <link rel="stylesheet" href="/public/css/themify-icons.css">
     <link rel="stylesheet" href="/public/css/home.css">
     <link rel="stylesheet" href="/public/css/updateProfile.css">
+    <link rel="stylesheet" href="/public/css/search.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
@@ -29,9 +31,7 @@
         var mainURL="http://localhost:3000";
      
         var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        function showaddPostProfile(user){
-            document.getElementById("profile-image-display").setAttribute("src",mainURL + "/" + user.profileImage);
-}
+
      
      </script>
 
@@ -41,7 +41,7 @@
 <div class="container">
     <div class="nav1 backgroundDiv">
         <div class="brand-name">
-            <h1>Instabook</h1>
+            <h1 style="font-weight: lighter;">InstaBook</h1>
         </div>
         <div class="items">
             <a href="/home" class="nav1-items"> <span><img class="icon" src="/public/icons/home.svg" alt=""></span><h2 class="h2-mod">Home</h2></a>
@@ -52,8 +52,14 @@
             
             
             <div class="search">
-                <form onsubmit="return doSearch(this)">
-                    <input type="text" class="searchbox" placeholder="Search"> 
+                <form  class="searchbox" onsubmit="return false">
+                    <input class="input-searchbox" type="text"  placeholder="Search" autocomplete="off" >
+                        <button class="ti-search" style="background: transparent;
+                        width: auto;
+                        display: inline;
+                        color: black;
+                        font-size: x-large;
+                        font-weight: 600; margin:0; outline: none;" type="button" onclick="onSearch(this);"></button>
                 </form>
     
             </div>
@@ -62,9 +68,10 @@
     </div>
 
 
+
     <div class="main">
         <div class="brand-name">
-            <h1>Instabook</h1>
+            <h1 style="font-weight: lighter;">InstaBook</h1>
         </div>
 
         
