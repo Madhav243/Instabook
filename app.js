@@ -44,7 +44,7 @@ var socketIO=require("socket.io")(http);
 var socketID="";
 var users=[];
 
-var mainURL="localhost:3000";
+var mainURL="https://stormy-cliffs-42430.herokuapp.com/";
 //main url also in header chnge  and footer alsowhile deploying
 
 socketIO.on('connection',function(socket)

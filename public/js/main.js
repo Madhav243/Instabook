@@ -1,6 +1,6 @@
 
 
-var mainURL = "http://localhost:3000";
+var mainURL = "https://stormy-cliffs-42430.herokuapp.com/";
 var socketIO = io(mainURL);
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
