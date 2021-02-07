@@ -41,26 +41,26 @@ app.use("/public",express.static(__dirname+"/public"));
 
 
 var socketIO=require("socket.io")(http);
-var socketId="";
+var socketID="";
 var users=[];
 
 var mainURL="localhost:3000";
 //main url also in header chnge  and footer alsowhile deploying
 
-socketIO.on("connection",function(socket)
+socketIO.on('connection',function(socket)
 {
-  console.log("User connected",socket.id);
-  socketId=socket.id;
+  
+  socketID=socket.id;
 
 }
 );
 
 http.listen(3000, function() {
-  console.log("Server started on port 3000");
+  
 
   mongoClient.connect("mongodb://localhost:27017",function(error,client){
     var database=client.db("instabook");
-    console.log("Database is connected");
+   
 
   //get signup 
     app.get("/signup",function(req,res){
@@ -489,6 +489,7 @@ http.listen(3000, function() {
         }
 
         if (request.files.video.size > 0 && request.files.video.type.includes("video")) {
+
           video = "public/videos/" + new Date().getTime() + "-" + request.files.video.name;
           fileSystem.rename(request.files.video.path, video, function (error) {
             //
@@ -560,6 +561,13 @@ http.listen(3000, function() {
       } else {
         var ids = [];
         ids.push(user._id);
+        for(var i=0;i<user.friends.length;i++)
+        {
+          var friend=user.friends[i];
+          if(friend.status=="Accepted"){
+            ids.push(friend._id);
+          }
+        }
         database.collection("posts")
 					.find({
 						"user._id": {
@@ -569,7 +577,7 @@ http.listen(3000, function() {
 					.sort({
 						"createdAt": -1
 					})
-					.limit(5)
+					
 					.toArray(function (error, data) {
 
 						result.json({
@@ -1167,8 +1175,30 @@ http.listen(3000, function() {
                   "sentByMe": false,
                   "inbox":[]
                 }
+                
+               
               }
+              
             },function(error,data){
+
+              database.collection("users").updateOne({
+                "_id":ObjectId(_id)
+              },{
+                $push:{
+                  "notifications":{
+                    "_id":ObjectId(),
+                    "type":"friend_request",
+                    "senders_id":me._id,
+                    "content":me.username+" sent you friend request. ",
+                    "createdAt": new Date().getTime()
+                  }
+                }
+                
+              });
+
+
+
+
               database.collection("users").updateOne({
                 "_id":me._id
               },{
@@ -1206,13 +1236,417 @@ http.listen(3000, function() {
 
 
 
+  app.post("/acceptFriendrequest",function(request,result){
+    var _id= request.fields._id;
+    var accessToken=request.fields.accessToken;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,user){
+      if(user == null)
+      {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        var me=user;
+        database.collection("users").findOne({
+          "_id":ObjectId(_id)
+        },function(error,user){
+          if(user == null)
+          {
+            result.json({
+              "status": "error",
+              "message": "User does not exist."
+            });
+          } else {
+            database.collection("users").updateOne({
+              "_id":ObjectId(_id)
+            },{
+              $push:{
+                "notifications":{
+                  "_id":ObjectId(),
+                  "type":"friend_request_accepted",
+                  "content":me.username+" accepted your friend request ",
+                  "createdAt": new Date().getTime()
+                }
+              }
+            });
+            database.collection("users").updateOne({
+              $and:[
+                {
+                  "_id":ObjectId(_id)
+                },{
+                  "friends._id":me._id
+                }
+              ]
+            },{
+              $set:{
+                "friends.$.status":"Accepted"
+              }
+            },function(error,data){
+              database.collection("users").updateOne({
+                $and:[
+                  {
+                    "_id":me._id
+                  },{
+                    "friends._id":user._id
+                  }
+                ]
+              },{
+                $set:{
+                  "friends.$.status":"Accepted"
+                }
+              },function(error,data){
+                result.json({
+                  "status": "success",
+                  "message": "Friend Request Accepted !"
+                });
+              });
+            });
 
 
+          }
+        });
+      }
+    });
+
+
+  });
+
+
+
+  app.post("/unfriend",function(request,result){
+
+    
+    var _id= request.fields._id;
+    var accessToken=request.fields.accessToken;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,user){
+      if(user == null)
+      {
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        var me=user;
+        database.collection("users").findOne({
+          "_id":ObjectId(_id)
+        },function(error,user){
+          if(user == null)
+          {
+            result.json({
+              "status": "error",
+              "message": "User does not exist."
+            });
+          } else {
+            database.collection("users").updateOne({
+              "_id":ObjectId(_id)
+            },{
+              $pull:{
+                "friends":{
+                  "_id":me._id
+                }
+              }
+            },function(error,data){
+              database.collection("users").updateOne({
+                    "_id":me._id
+              },{
+                $pull:{
+                  "friends":{
+                    "_id":user._id
+                  }
+                }
+              },function(error,data){
+                result.json({
+                  "status": "success",
+                  "message": "Friend has been removed !"
+                });
+              });
+            });
+
+
+          }
+        });
+      }
 
 
   });
 });
 
+
+  app.get("/user/:username",function(request,result){
+    var username=request.params.username;
+    result.render("profile",{"username":username});
+  });
+
+
+  app.post("/getUserProfile",function(request,result){
+    var username=request.fields.username;
+    var accessToken=request.fields.accessToken;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,loggedUser){
+      if(loggedUser==null){
+        result.json({
+          "status": "error",
+          "message": "User has been logged out. Please login again."
+        });
+      } else {
+        if(loggedUser.username==username){
+          result.json({
+            "status": "success",
+            "message": "This is loggedin user",
+            "ownerProfile":true,
+            "isFriend":false,
+            "otherUser":false,
+            "data":loggedUser
+          });
+        } else {
+          database.collection("users").findOne({
+            "username":username
+          },function(error,user){
+            if(user==null){
+              result.json({
+                "status": "error",
+                "message": "User does not exist."
+              });
+            } else {
+              database.collection("users").findOne({
+                $and:[
+                  {
+                    "username":loggedUser.username
+                  },{
+                    "friends.username":username
+                  }
+                ]
+              },function(error,userInFriend){
+                if(userInFriend==null){
+                  result.json({
+                    "status": "success",
+                    "message": "This is other user",
+                    "ownerProfile":false,
+                    "isFriend":false,
+                    "otherUser":true,
+                    "data":user
+                  });
+                } else {
+                  result.json({
+                    "status": "success",
+                    "message": "This is friend of user",
+                    "ownerProfile":false,
+                    "isFriend":true,
+                    "otherUser":false,
+                    "data":user
+                  });
+                }
+
+              });
+
+            }
+
+          });
+
+
+
+        }
+      }
+    });
+
+  });
+
+  app.get("/messages",function(req,res){
+    res.render("messages");
+  });
+
+
+  app.get("/messages/:username/:id",function(request,result){
+    var username=request.params.username;
+    var id=request.params.id;
+    result.render("messageFriend",{"username":username,
+  "id":id});
+  })
+
+
+  app.get("/notifications",function(req,res){
+    res.render("notifications");
+  });
+
+  app.post("/getnotifications",function(request,result){
+    var accessToken=request.fields.accessToken;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,user){
+      if(user==null)
+      { 
+        result.json({
+          "status":"error",
+          "message":"User has been logged out. Please login in again. "
+        });
+
+      } else {
+        
+          result.json({
+            "status":"success",
+            "message":"Notifications have been fetched !",
+            "data":user.notifications
+          });
+       
+
+      }
+
+    });
+  });
+
+
+  app.post("/getPreviousChat",function(request,result){
+
+    var otherUserid=request.fields._id;
+    var accessToken = request.fields.accessToken;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,loggeduser){
+      if(loggeduser==null){
+        result.json({
+          "status":"error",
+          "message":"User has been Logged out . Please login again "
+        });
+      } else {
+        var index=loggeduser.friends.findIndex(function(friend){
+          return friend._id==otherUserid
+        });
+
+        var inbox=loggeduser.friends[index].inbox;
+        result.json({
+          "status":"success",
+          "message":"Record has been fetched ! ",
+          "data":inbox
+        });
+
+      }
+
+    });
+  });
+
+
+  app.post("/sendMessage",function(request,result){
+    var otherUserid=request.fields._id;
+    var accessToken= request.fields.accessToken;
+    var message=request.fields.message;
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,loggeduser){
+      if(loggeduser==null)
+      {
+        result.json({
+          "status":"error",
+          "message":"User has been logged out. Please login again !"
+        });
+      } else {
+        var me=loggeduser;
+        database.collection("users").findOne({
+          "_id":ObjectId(otherUserid)
+        },function(error,otheruser){
+          if(otheruser==null){
+            result.json({
+              "status":"error",
+              "message":"User does not exist!"
+            });
+          } else {
+            database.collection("users").updateOne({
+              $and:[
+                {
+                  "_id":ObjectId(otherUserid)
+                },{
+                  "friends._id":me._id
+                }
+              ]
+            },{
+              $push:{
+                "friends.$.inbox":{
+                  "_id":ObjectId(),
+                  "message":message,
+                  "from":me._id
+
+                }
+              }
+            },function(error,data){
+              database.collection("users").updateOne({
+                $and:[
+                  {
+                    "_id":me._id
+                  },{
+                    "friends._id":otheruser._id
+                  }
+                ]
+              },{
+                $push:{
+                  "friends.$.inbox":{
+                    "_id":ObjectId(),
+                    "message":message,
+                    "from":me._id
+  
+                  }
+                }
+
+              },function(error,data){
+                socketIO.to(users[otheruser._id]).emit("messageReceived",{
+                  "message":message,
+                  "from":me._id
+                });
+
+                result.json({
+                  "status":"success",
+                  "message":"Message has been sent"
+                });
+
+              });
+
+
+            });
+
+          }
+
+        });
+      }
+    });
+  });
+
+
+  app.post("/connectSocket",function(request,result){
+    var accessToken=request.fields.accessToken;
+
+    database.collection("users").findOne({
+      "accessToken":accessToken
+    },function(error,user){
+        if(user==null){
+          result.json({
+            "status":"error",
+            "message":"User has been Logged out . Please Login again !"
+          });
+        } else {
+          users[user._id]=socketID;
+          result.json({
+            "status":"success",
+            "message":"User has been connect"
+          });
+        }
+
+    });
+
+  })
+
+
+
+  });
+});
 
 
 

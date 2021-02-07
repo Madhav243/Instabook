@@ -1,4 +1,10 @@
 
+
+var mainURL = "http://localhost:3000";
+var socketIO = io(mainURL);
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+
 function showaddPostProfile(user){
     document.getElementById("profile-image-display").setAttribute("src",mainURL + "/" + user.profileImage);
 }
@@ -11,6 +17,8 @@ function toogle()
 document.getElementById("nav-2-display").classList.toggle('active');
 document.getElementById("tooglebutton").classList.toggle('active2');
 }
+
+
 window.user=null;
 
 function getUser()
@@ -36,7 +44,7 @@ function getUser()
                 {
                     showProfileData(response.data);
                 }
-                if(window.location.href==mainURL+"/home")
+                if(typeof isHome !== "undefined" && isHome)
                 {
                     showaddPostProfile(response.data);
                     showNewsfeed();
@@ -47,7 +55,20 @@ function getUser()
                 if (typeof isFriends !== "undefined" && isFriends) {
                     showFriends();
                 }
-                
+                if (typeof isProfile !== "undefined" && isProfile) {
+                    showProfile();
+                }
+                if (typeof isMessages !== "undefined" && isMessages) {
+                    showMessageFriends();
+                }
+                if (typeof isMessageBox !== "undefined" && isMessageBox) {
+                    showMessageBox();
+                }
+                if (typeof isNotifications !== "undefined" && isNotifications) {
+                    showNotifications();
+                }
+                document.getElementById("ownerProfile").setAttribute("href",mainURL+"/user/"+window.user.username);
+                document.getElementById("ownerProfile2").setAttribute("href",mainURL+"/user/"+window.user.username);
             }
         };
         var formData = new FormData();
@@ -114,14 +135,583 @@ function onSearch(button) {
     }
 
 
+    function showSearchResults() {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/search", true);
+        
+        ajax.onreadystatechange = function() {
+
+            if (this.readyState == 4 && this.status == 200){
+                var response = JSON.parse(this.responseText);
+
+                if (response.status == "success")
+                {
+                    var html = "";
+                    if(response.data.length==0 || (response.data.length==1 && response.data[0]._id==window.user._id))
+                    {
+                        alert("No match found. Search Another User !!");
+                    }
+                    else{
+                        for (var a = 0; a < response.data.length; a++) {
+						var data = response.data[a];
+
+						if (data._id == window.user._id) {
+							continue;
+                        } 
+                        var isFriend=false;
+                        for(var b=0; b<window.user.friends.length; b++)
+                        {
+                            var tempdata=window.user.friends[b];
+                            var friendRequestStatusPending=false;
+                            var showAcceptReject=false;
+                            if(tempdata._id==data._id)
+                            {   
+                                if(tempdata.status=="Pending")
+                                {
+                                    if(tempdata.sentByMe)
+                                    {
+                                        friendRequestStatusPending=true;
+                                    }
+                                    else{
+                                        showAcceptReject=true;
+                                    }
+                                }
+
+                                isFriend=true;
+                                break;
+                            }
+                        }
+                        html+='<div class="backgroundDiv" style="margin: 5px auto;" >';
+                            html+='<div class="username-profileimage" style="border-bottom: none;">';
+                                html+='<label>';
+                                    html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
+                                        var proImage=getProfileImage(data._id); 
+                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
+                                            html+='<label style="cursor: pointer;">';
+                                                html+='<h3 >'+data.username+'</h3>';
+                                                    html+='</label>';
+                                                    html+='</a></label>';
+                                                    if(isFriend)
+                                                    {
+                                                        if(friendRequestStatusPending)
+                                                        {
+                                                            html+='<div><div class="unfriend-button" >';
+                                                            
+                                                            html+=' Request Pending!';
+                                                        html+='</div></div>';
+                                                        }
+                                                        else if (showAcceptReject){
+                                                            
+                                                            html+='<div style="display:flex;"><div class="unfriend-button" style="margin:30px 10px; width:70px; background: linear-gradient(45deg,#f09433 0%,#e6683c 25%, #dc2743 50%,#cc2366 75%, #bc1888 100% );color: white;"  >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="doAccept(this);" style="text-decoration: none; color: white;" >'; 
+                                                            html+='Accept</a>';
+                                                        html+='</div>';
+                                                        html+='<div class="unfriend-button" style="margin:30px 10px; width:70px;" >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="doUnfriend(this);" style="text-decoration: none; color: black;" >'; 
+                                                            html+='Reject</a>';
+                                                        html+='</div></div>';
+                                                        
+
+                                                        }
+                                                        else{
+                                                            html+='<div><div class="unfriend-button" >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="doUnfriend(this);" style="text-decoration: none; color: black;" >'; 
+                                                            html+='Unfriend <i class="ti-back-left"></i></a>';
+                                                        html+='</div></div>';
+                                                        }
+                                                        
+                                                    }
+                                                    else{
+                                                        html+='<div><div class="unfriend-button" >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="sendFriendRequest(this);" style="text-decoration: none; color: black;" >';
+                                                            html+='Send Request + </a>';
+                                                        html+='</div></div>';
+                                                    }
+                                                    html+='</div></div>';
+                        
+                    
+                    }
+                    }
+					
+                    document.getElementById("searchResults").innerHTML=html;
+                }
+                else{
+                    alert(response.message);
+                }
+            }
+        };
 
 
 
+        var formData = new FormData();
+		formData.append("query", document.getElementById("query").value);
+		ajax.send(formData);
+    }
+
+    function sendFriendRequest(self)
+    {
+        var _id=self.getAttribute("data-id");
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/sendFriendRequest",true);
+
+        ajax.onreadystatechange=function()
+        {
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+
+                alert(response.message);
+                if(response.status=="success"){
+                    self.remove();
+                    location.reload();
+                }
+                
+            }
+        };
+
+        var formData=new FormData();
+        formData.append("_id",_id);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        ajax.send(formData);
+    }
 
 
+    function doAccept(self)
+    {
+        var _id=self.getAttribute("data-id");
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/acceptFriendRequest", true);
+
+        ajax.onreadystatechange=function()
+        {
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+                alert(response.message);
+                self.remove();
+                location.reload();
+            }
+        };
+
+        var formData = new FormData();
+        formData.append("_id",_id);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        ajax.send(formData);
+
+
+    }
+
+    function doUnfriend(self)
+    {
+        if(confirm("Are you sure?")){
+            var _id=self.getAttribute("data-id");
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/unfriend", true);
+
+        ajax.onreadystatechange=function()
+        {
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+                alert(response.message);
+                self.remove();
+                location.reload();
+            }
+        };
+
+        var formData = new FormData();
+        formData.append("_id",_id);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        ajax.send(formData);
+        }
+        
+
+
+    }
+
+
+
+    function showNotifications()
+    {
+
+        var ajax= new XMLHttpRequest();
+        ajax.open("POST","getnotifications",true);
+
+        ajax.onreadystatechange = function()
+        {
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+                console.log(response);
+
+                if(response.status=="success"){
+                    var html='';
+                    var notificationss=response.data;
+                    notificationss.sort(function(a,b){
+                        var x=a.createdAt;
+                        var y=b.createdAt;
+                        return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+                    });
+                   
+
+                    for( var i=0; i<notificationss.length;i++)
+                    {
+                        var notification=notificationss[i];
+                        if(notification.type=="friend_request"){
+
+                            html+='<div class="backgroundDiv" style="margin-top: 5px; margin-bottom: 5px;"><div class="notifications" ><div class="notification-content" >';
+                                html+='<h4>';
+                                    html+=notification.content;
+                                    html+='</h4>';
+                                    var createdAt = new Date(notification.createdAt);
+                                    var date = createdAt.getDate() + "";
+                                    date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();
+                                    html+=date;
+                                    html+='</div>';
+                                    for (var j=0 ; j<window.user.friends.length;j++)
+                                    {
+                                        var friend=window.user.friends[j];
+                                        if(friend._id==notification.senders_id)
+                                        {
+                                            if(friend.status=="Accepted"){
+
+                                                html+='<div class="accept-buttons" style="display: flex;">';
+                                                    html+='<div class="unfriend-button" style="margin:30px 10px; width:70px;" >';
+                                                        html+='<a href="javascript:void(0);" data-id="'+friend._id+'" onclick="doUnfriend(this);" style="text-decoration: none; color: black;" >'; 
+                                                            html+='Unfriend</a>';
+                                                        html+='</div>';
+                                                    html+='</div></div>';
+                                            } 
+                                            else if (friend.status=="Pending")
+                                            {
+                                                if(!friend.sentByMe)
+                                                {
+                                                    html+='<div class="accept-buttons" style="display: flex;">';
+                                        html+='<div class="unfriend-button" style="margin:30px 10px; width:70px; background: linear-gradient(45deg,#f09433 0%,#e6683c 25%, #dc2743 50%,#cc2366 75%, #bc1888 100% );color: white;"  >';
+                                            html+='<a href="javascript:void(0);" data-id="'+notification.senders_id+'" onclick="doAccept(this);" style="text-decoration: none; color: white;" >'
+                                              html+='Accept</a></div>';
+                                              html+='<div class="unfriend-button" style="margin:30px 10px; width:70px;" >';
+                                                html+='<a href="javascript:void(0);" data-id="'+notification.senders_id+'" onclick="doUnfriend(this);" style="text-decoration: none; color: black;" >';
+                                                    html+='Reject</a></div></div></div>';
+                                                }
+                                                
+                                            }
+                                        }
+                                    }
+                                    html+='</div>';
+
+                        }
+                        else {
+                            html+='<div class="backgroundDiv" style="margin-top: 5px; margin-bottom: 5px;"><div class="notifications" ><div class="notification-content" >';
+                                html+='<h4>';
+                                    html+=notification.content;
+                                    html+='</h4>';
+                                    var createdAt = new Date(notification.createdAt);
+                                    var date = createdAt.getDate() + "";
+                                    date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();
+                                    html+=date;
+                                    html+='</div></div></div>';
+                        }
+                    }
+                document.getElementById("notifications").innerHTML=html;
+                } else {
+                    alert(response.message);
+                }
+            }
+        };
+
+        var formData = new FormData();
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        ajax.send(formData);
+        
+
+
+
+    }
+
+
+
+    function showProfile(){
+        var username=document.getElementById("userProfile").value;
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/getUserProfile",true);
+
+        ajax.onreadystatechange=function(){
+            if (this.readyState == 4 && this.status == 200)
+            {
+                var response=JSON.parse(this.responseText);
+                if(response.status=="success"){
+                    var data=response.data;
+                    var ownerProfile=response.ownerProfile;
+                    var isFriend=response.isFriend;
+                    var otherUser=response.otherUser;
+                    var count=0;
+                    for(var i=0;i<data.friends.length;i++)
+                                                {
+                                                    var friend=data.friends[i];
+                                                    if(friend.status=="Accepted"){
+                                                        count++;
+                                                    }
+                                                }
+                    var html='';
+                    html+='<div class="backgroundDiv" style="display: flex; flex-direction: row;" >';
+                        html+='<div class="image-name-about" >';
+                            var proImage=getProfileImage(data._id); 
+                            html+='<img src="' + mainURL + "/" + proImage + '">';
+                            html+='<h3>';
+                                html+=data.name;
+                                html+='</h3>';
+                                html+='<p>';
+                                    html+=data.aboutMe;
+                                    html+='</p>';
+                                    html+='</div>';
+                                    html+='<div class="friends-posts-button" ><div class="friends-posts" ><div class="posts-number">';
+                                        html+='<h3>';
+                                            html+=data.posts.length;
+                                            html+='</h3>';
+                                            html+='<h3>Posts</h3>';
+                                            html+='</div>';
+                                            html+='<div class="friends-number">';
+                                                html+='<h3>';
+                                            html+=count;
+                                            html+='</h3>';
+                                            html+='<h3>Friends</h3>';
+                                            html+='</div></div>';
+                                            if(ownerProfile===true){
+                                                html+='<div style="display:flex;flex-direction: row;align-items: center;justify-content: space-evenly;"><div class="unfriend-button" style="margin:30px 10px;  background: linear-gradient(45deg,#f09433 0%,#e6683c 25%, #dc2743 50%,#cc2366 75%, #bc1888 100% );color: white;"  >';
+                                                            html+='<a href="'+mainURL+'/updateProfile"  style="text-decoration: none; color: white;" >'; 
+                                                            html+='Update</a>';
+                                                        html+='</div>';
+                                                        html+='<div class="unfriend-button" style="margin:30px 10px; " >';
+                                                            html+='<a href="'+mainURL+'/friends"  style="text-decoration: none; color: black;" >'; 
+                                                            html+='Friend List</a>';
+                                                        html+='</div></div></div></div>';
+
+                                                            for(var i=0;i<data.posts.length;i++){
+
+                                                                var post=data.posts[i];
+                                                                html+='<div class="backgroundDiv postCard">';
+                                                                    html+='<div class="username-profileimage" >';
+                                                                        html+='<label >';
+                                                                            html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
+                                       
+                                                                                html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + data.profileImage + '">';
+                                                                                html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.username+'</h3>';
+                                                                                    var createdAt = new Date(post.createdAt);
+                                                                                var date = createdAt.getDate() + "";
+                                                                                date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();                         
+                                                                                html+='<h4 style="font-weight: lighter;">'+date+'</h4></label></a></label>';
+                                                                                if(data.username==window.user.username)
+                                                                                {
+                                                                                    html+='<span class="delete" onclick="deletePost(this);" data-id="' + post._id + '">';
+                                                                                        html+='<i class="ti-trash" style="font-size: 30px;"></i>';
+                                                                                        html+='</span>';
+                                                                                }
+                                                                                html+='</div>';
+                                                                                html+='<div class="post-image-video" style="padding: 10px; border-bottom: 1px solid rgba(133, 130, 130, 0.486);">';
+                                                                                if (post.image != "") {
+                                                                                    html+='<img src="' + mainURL + "/" + post.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
+                                                                                }
+                                                                                if (post.video != "") {
+                                                                                    html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="' + mainURL + "/" + post.video + '"></video>';     
+                                                                                }
+                                                                                html+='<div class="post-caption">'+ post.caption+'</div></div>';
+                                                                                html+=createLikesSection(post);
+                                                                                html += "<div id='post-comments-" + post._id + "'>";
+                                                                                html += createCommentsSection(post);
+                                                                                html += "</div>";
+                                                                                html+='</div>';
+                                }
+
+
+
+                                            } else if (isFriend===true){
+                                                var friendStatus='';
+                                                var sentStatus=false;
+                                                for(var i=0;i<window.user.friends.length;i++)
+                                                {
+                                                    var friend=window.user.friends[i];
+                                                    if(friend._id==data._id){
+                                                        friendStatus=friend.status;
+                                                        sentStatus=friend.sentByMe;
+                                                        break;
+
+                                                    }
+                                                }
+
+
+
+                                                if(friendStatus=="Accepted")
+                                                {
+                                                    html+='<div style="display:flex;flex-direction: row;align-items: center;justify-content: space-evenly;"><div class="unfriend-button" style="margin:30px 10px; width:70px; background: linear-gradient(45deg,#f09433 0%,#e6683c 25%, #dc2743 50%,#cc2366 75%, #bc1888 100% );color: white;"  >';
+                                                            html+='<a href="/messages/'+data.username+'/'+data._id+'"  style="text-decoration: none; color: white;" >'; 
+                                                            html+='Message</a>';
+                                                        html+='</div>';
+                                                        html+='<div class="unfriend-button" style="margin:30px 10px; width:70px;" >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="doUnfriend(this);" style="text-decoration: none; color: black;" >'; 
+                                                            html+='Unfriend</a>';
+                                                        html+='</div></div></div></div>';
+                                                        for(var i=0;i<data.posts.length;i++){
+
+                                                                var post=data.posts[i];
+                                                                html+='<div class="backgroundDiv postCard">';
+                                                                    html+='<div class="username-profileimage" >';
+                                                                        html+='<label >';
+                                                                            html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
+
+                                                                                html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + data.profileImage + '">';
+                                                                                html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.username+'</h3>';
+                                                                                    var createdAt = new Date(post.createdAt);
+                                                                                var date = createdAt.getDate() + "";
+                                                                                date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();                         
+                                                                                html+='<h4 style="font-weight: lighter;">'+date+'</h4></label></a></label>';
+                                                                                if(data.username==window.user.username)
+                                                                                {
+                                                                                    html+='<span class="delete" onclick="deletePost(this);" data-id="' + post._id + '">';
+                                                                                        html+='<i class="ti-trash" style="font-size: 30px;"></i>';
+                                                                                        html+='</span>';
+                                                                                }
+                                                                                html+='</div>';
+                                                                                html+='<div class="post-image-video" style="padding: 10px; border-bottom: 1px solid rgba(133, 130, 130, 0.486);">';
+                                                                                if (post.image != "") {
+                                                                                    html+='<img src="' + mainURL + "/" + post.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
+                                                                                }
+                                                                                if (post.video != "") {
+                                                                                    html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="' + mainURL + "/" + post.video + '"></video>';     
+                                                                                }
+                                                                                html+='<div class="post-caption">'+ post.caption+'</div></div>';
+                                                                                html+=createLikesSection(post);
+                                                                                html += "<div id='post-comments-" + post._id + "'>";
+                                                                                html += createCommentsSection(post);
+                                                                                html += "</div>";
+                                                                                html+='</div>';
+                                                                }
+
+
+
+                                                        
+
+                                                } else if (friendStatus=="Pending"){
+                                                    if(sentStatus)
+                                                        {
+                                                            html+='<div class="unfriend-button"  >';
+                                                            
+                                                            html+=' Request Pending!';
+                                                        html+='</div></div></div>';
+                                                        html+='<div>';
+                                                            html+='<img src="'+ mainURL+'/public/icons/lock.svg" style="width:400px; height:400px;margin:30px;">';
+                                                            html+='</div>';
+                                                        }
+                                                    else{
+                                                            
+                                                        html+='<div style="display:flex;flex-direction: row;align-items: center;justify-content: space-evenly;"><div class="unfriend-button" style="margin:30px 10px; width:70px; background: linear-gradient(45deg,#f09433 0%,#e6683c 25%, #dc2743 50%,#cc2366 75%, #bc1888 100% );color: white;"  >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="doAccept(this);" style="text-decoration: none; color: white;" >'; 
+                                                            html+='Accept</a>';
+                                                        html+='</div>';
+                                                        html+='<div class="unfriend-button" style="margin:30px 10px; width:70px;" >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="doUnfriend(this);" style="text-decoration: none; color: black;" >'; 
+                                                            html+='Reject</a>';
+                                                        html+='</div></div></div></div>';
+                                                        html+='<div>';
+                                                            html+='<img src="'+ mainURL+'/public/icons/lock.svg" style="width:400px; height:400px;margin:30px;">';
+                                                            html+='</div>';
+                                                        }
+
+                                                }
+                                            } else if (otherUser ===true){
+                                                
+                                                html+='<div class="unfriend-button" >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="sendFriendRequest(this);" style="text-decoration: none; color: black;" >';
+                                                            html+='Send Request + </a>';
+                                                        html+='</div></div></div>';
+                                                        html+='<div>';
+                                                            html+='<img src="'+ mainURL+'/public/icons/lock.svg" style="width:400px; height:400px; margin:30px;">';
+                                                            html+='</div>';
+                                            }
+
+                                            
+                    document.getElementById("userProfileDisplay").innerHTML=html;
+
+                } else {
+                    alert(response.message);
+                    
+                }
+            }
+        };
+
+
+
+        var formData=new FormData();
+        formData.append("username",username);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        ajax.send(formData);
+    }
+
+
+    function showMessageFriends(){
+        var html='';
+        for(var a=0;a<window.user.friends.length;a++){
+            var data=window.user.friends[a];
+            if(data.status=="Accepted")
+            {
+                
+                    html+='<div class="backgroundDiv" style="margin: 5px auto; " >';
+                        html+='<div class="username-profileimage" style="border-bottom: none; cursor:pointer" onclick="redirect(\''+data.username+'\',\''+data._id+'\');">';
+                            html+='<label>';
+                                html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
+                                    var proImage=getProfileImage(data._id); 
+                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
+                                            html+='<label style="cursor: pointer;">';
+                                                html+='<h3 >'+data.name+'</h3>';
+                                                    html+='</label>';
+                                                    html+='</a></label>';
+                                                    html+='</div>';
+                                                    
+                                                    html+='</div>';
+                                                    
+            }
+        }
+        document.getElementById("friends2").innerHTML=html;
+        
+    }
     
 
+    function redirect(username,id){
+        window.location.href=mainURL +'/messages/'+username+'/'+id;
+    } 
 
+    function showFriends()
+    {
+        var html='';
+        for(var a=0;a<window.user.friends.length;a++)
+        {
+            var data=window.user.friends[a];
+            if(data.status=="Accepted")
+            {
+                html+='<div class="backgroundDiv" style="margin: 5px auto;" >';
+                            html+='<div class="username-profileimage" style="border-bottom: none;">';
+                                html+='<label>';
+                                    html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
+                                        var proImage=getProfileImage(data._id); 
+                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
+                                            html+='<label style="cursor: pointer;">';
+                                                html+='<h3 >'+data.username+'</h3>';
+                                                    html+='</label>';
+                                                    html+='</a></label>';
+                                                    html+='<div><div class="unfriend-button" >';
+                                                            html+='<a href="javascript:void(0);" data-id="'+data._id+'" onclick="doUnfriend(this);" style="text-decoration: none; color: black;" >'; 
+                                                            html+='Unfriend <i class="ti-back-left"></i></a>';
+                                                                html+='</div></div>';
+                                                                html+='</div></div>';
+                                                        
+
+                
+            }
+            
+        }
+        document.getElementById("friends").innerHTML=html;
+
+    }
 
 function doLogout()
 {
@@ -255,7 +845,7 @@ function createCommentsSection(data)
 {
     var html="";
     html+='<div class="comment-section" >';
-        html+='<div class="comment-input" ">';
+        html+='<div class="comment-input" >';
             html+='<a href="/user/'+ window.user.username +'" style="display: flex; align-items: center; color:black; text-decoration: none;">';
                 html+='<img src="' + mainURL + '/' + window.user.profileImage + '" class="comment-input-image" >';
                 html+='<label  class="comment-input-username" ><h4>'+ window.user.username+'</h4> </label></a>';
@@ -415,10 +1005,10 @@ function deletePost(self)
             if (this.readyState == 4 && this.status == 200){
                 var response = JSON.parse(this.responseText);
                 alert(response.message);
-                if (response.status == "success"){
-                    showNewsfeed();
+                
+                if(response.status=="success"){
+                    location.reload();
                 }
-
 
             }
         };
@@ -503,7 +1093,12 @@ function showNewsfeed()
                                     html+='<a href="/user/'+data.user.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
                                     var proImage=getProfileImage(data.user._id);   
                                     html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
-                                    html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.user.username+'</h3>';
+                                    
+                                    html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.user.username+'';
+                                    if(data.type=="shared"){
+                                        html+='<img src="'+mainURL+'/public/icons/retweet.svg" style="width:20px;margin-left:50px;"';
+                                    }
+                                    html+='</h3>';
                                     var createdAt = new Date(data.createdAt);
                                     var date = createdAt.getDate() + "";
                                     date = date.padStart(2, "0") + " " + months[createdAt.getMonth()] + ", " + createdAt.getFullYear();                         

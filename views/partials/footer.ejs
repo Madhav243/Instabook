@@ -1,9 +1,9 @@
 <div class="nav2"  >
     <div class="items sidebar" id="nav-2-display" >
             <a href="/home" class="nav1-items"> <span><img class="icon" src="/public/icons/home.svg" alt=""></span><h2 class="h2-mod">Home</h2></a>
-            <a href="/messages" class="nav1-items"> <span><img class="icon" src="/public/icons/message.svg" alt=""></span><h2 class="h2-mod">Message</h2></a>
+            <a href="/messages" class="nav1-items"> <span><img class="icon" src="/public/icons/message.svg" alt=""></span><h2 class="h2-mod">Inbox</h2></a>
             <a href="/notifications" class="nav1-items"> <span><img class="icon" src="/public/icons/notification.svg" alt=""></span><h2 class="h2-mod">Notification</h2></a>
-            <a href="/profile" class="nav1-items"> <span><img class="icon" src="/public/icons/profile.svg" alt=""></span><h2 class="h2-mod">Profile</h2></a>
+            <a href="/profile" id="ownerProfile2" class="nav1-items"> <span><img class="icon" src="/public/icons/profile.svg" alt=""></span><h2 class="h2-mod">Profile</h2></a>
             <a href="/login" onclick="return doLogout();" class="nav1-items"> <span><img class="icon" src="/public/icons/logout.svg" alt=""></span><h2 class="h2-mod">Logout</h2></a>
 
             <div class="search">
@@ -51,15 +51,10 @@
 
 </div>
 
-<script>
-function toogle()
-{
-document.getElementById("nav-2-display").classList.toggle('active');
-document.getElementById("tooglebutton").classList.toggle('active2');
-}
-</script>
+
 
 <script src="/public/js/socket.io.js"></script>
+
 <script src="/public/js/jquery-3.3.1.min.js"></script>
 <script src="/public/js/main.min.js"></script>
 <script src="/public/js/main.js"></script>
@@ -67,13 +62,13 @@ document.getElementById("tooglebutton").classList.toggle('active2');
 <script>
 
   
-    var mainURL = "http://localhost:3000";
-    var socketIO = io(mainURL);
+    
 
     
     window.onload = function()
     {
         getUser();
+        
     };
      window.onerror = function(file,line,error)
      {

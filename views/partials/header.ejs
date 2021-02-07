@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/public/css/themify-icons.css">
     <link rel="stylesheet" href="/public/css/home.css">
     <link rel="stylesheet" href="/public/css/updateProfile.css">
+    <link rel="stylesheet" href="/public/css/profile.css">
+    <link rel="stylesheet" href="/public/css/chatbox.css">
     <link rel="stylesheet" href="/public/css/search.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
@@ -22,21 +24,9 @@
 	%>
 
     <%
-			mainURL = "http://localhost:3000";
+			mainURL = "localhost:3000";
     %>
     
-    <script>
-   
-   
-        var mainURL="http://localhost:3000";
-     
-        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-     
-     </script>
-
-
-
 
 <div class="container">
     <div class="nav1 backgroundDiv">
@@ -45,9 +35,9 @@
         </div>
         <div class="items">
             <a href="/home" class="nav1-items"> <span><img class="icon" src="/public/icons/home.svg" alt=""></span><h2 class="h2-mod">Home</h2></a>
-            <a href="/messages" class="nav1-items"> <span><img class="icon" src="/public/icons/message.svg" alt=""></span><h2 class="h2-mod">Message</h2></a>
+            <a href="/messages" class="nav1-items"> <span><img class="icon" src="/public/icons/message.svg" alt=""></span><h2 class="h2-mod">Inbox</h2></a>
             <a href="/notifications" class="nav1-items"> <span><img class="icon" src="/public/icons/notification.svg" alt=""></span><h2 class="h2-mod">Notification</h2></a>
-            <a href="/profile" class="nav1-items"> <span><img class="icon" src="/public/icons/profile.svg" alt=""></span><h2 class="h2-mod">Profile</h2></a>
+            <a href="/profile" id="ownerProfile" class="nav1-items"> <span><img class="icon" src="/public/icons/profile.svg" alt=""></span><h2 class="h2-mod">Profile</h2></a>
             <a href="/login" onclick="return doLogout();" class="nav1-items"> <span><img class="icon" src="/public/icons/logout.svg" alt=""></span><h2 class="h2-mod">Logout</h2></a>
             
             

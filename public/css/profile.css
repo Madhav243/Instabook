@@ -1,0 +1,42 @@
+.image-name-about
+{
+    display: flex;
+        flex-direction: column;
+        width: 40%;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+}
+.image-name-about img{
+    width: 120px;
+            height: 120px;
+            border-radius: 100%;
+            border: 2px solid black;
+            margin-bottom: 10px;
+            margin-top: 10px;
+}
+.image-name-about p{
+    margin: 10px;
+}
+.friends-posts-button
+{
+    display: flex;
+        flex-direction: column;
+        width: 60%;
+        justify-content: center;
+}
+.friends-posts{
+    display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-evenly;
+}
+
+.notifications{
+    display:flex;
+}
+.notification-content
+{
+    width:70%;
+    margin: 10px;
+}

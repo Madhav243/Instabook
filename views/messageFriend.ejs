@@ -1,0 +1,155 @@
+<%- include("partials/header") -%>
+
+<div class="heading">
+    <a href="/user/<%= username %>" style="text-decoration: none;">
+        <h1><%= username %></h1>
+    </a>
+    
+</div>
+<input type="hidden" id="userProfile" value="<%= username %>"></input>
+<input type="hidden" id="userId" value="<%= id %>"></input>
+<div class="content"  >
+    
+   <div class="backgroundDiv" >
+       <div class="chatBox" id="chatBox">
+       
+       
+
+       
+       </div>
+       <div class="input-message" >
+           <form method="post" onsubmit="return doSendMessage(this);" style="display: flex;" >
+            <textarea name="message" id="" cols="90" rows="2" style="outline: none; margin: 10px; border-radius: 10px;" placeholder="">
+
+            </textarea>
+            <button type="submit" style="width: 100px;">
+                Send
+            </button>
+           </form>
+       </div>
+   </div>
+    
+    
+</div>
+
+
+<script>
+    var isMessageBox=true;
+
+    function showMessageBox()
+    {
+        var _id=document.getElementById("userId").value;
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/getPreviousChat",true);
+        ajax.onreadystatechange = function()
+        {
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+                var html='';
+                for(var i=0;i<response.data.length;i++){
+                    var inbox=response.data[i];
+                    if(inbox.from==window.user._id)
+                    {
+                        html+='<div class="me">';
+                            html+='<div>';
+                                html+=inbox.message;
+                                html+='</div>';
+                                html+='</div>';
+                    }
+                    else{
+                        html+='<div class="you">';
+                            html+=inbox.message;
+                            html+='</div>';
+                    }
+                }
+                document.getElementById("chatBox").innerHTML=html;
+                var objDiv=document.getElementById("chatBox");
+                objDiv.scrollTop=objDiv.scrollHeight;
+                connectSocket();
+            }
+
+        };
+
+        var formData=new FormData();
+        formData.append("_id",_id);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        ajax.send(formData);
+
+
+    }
+
+    
+    function doSendMessage(form){
+        var message=form.message.value;
+        var _id=document.getElementById("userId").value;
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/sendMessage",true);
+
+        ajax.onreadystatechange=function(){
+            if(this.readyState==4 && this.status==200){
+                var response = JSON.parse(this.responseText);
+
+                if(response.status=="success"){
+                    var html='';
+                    html+='<div class="me">';
+                            html+='<div>';
+                                html+=message;
+                                html+='</div>';
+                                html+='</div>';
+                    document.getElementById("chatBox").innerHTML +=html;
+                    form.message.value='';
+                    var objDiv=document.getElementById("chatBox");
+                    objDiv.scrollTop=objDiv.scrollHeight;
+
+                }
+            }
+        };
+        var formData = new FormData(form);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        formData.append("_id",_id);
+        ajax.send(formData);
+
+        return false;
+
+    }
+
+    function connectSocket()
+    {
+        var _id=document.getElementById("userId").value;
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/connectSocket",true);
+        ajax.onreadystatechange= function(){
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+
+                socketIO.on("messageReceived",function(messageObj){
+                    if(messageObj.from==_id)
+                    {
+                        var html='';
+                        html+='<div class="you">';
+                            html+=messageObj.message;
+                            html+='</div>';
+                            document.getElementById("chatBox").innerHTML +=html;
+                    
+                    var objDiv=document.getElementById("chatBox");
+                    objDiv.scrollTop=objDiv.scrollHeight;
+
+
+
+                    }
+                });
+            }
+        };
+        var formData = new FormData();
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+       
+        ajax.send(formData);
+
+    }
+
+
+</script>
+
+<%- include("partials/footer") -%>

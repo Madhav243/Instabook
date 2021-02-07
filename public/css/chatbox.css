@@ -1,0 +1,32 @@
+.chatBox
+{
+    display: flex;
+    flex-direction:column ;
+    max-height: 30rem;
+    overflow-y: scroll;
+}
+.chatBox::-webkit-scrollbar{
+    visibility: hidden;
+}
+.me
+{
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    margin: 10px;
+}
+.me div
+{
+    width: 80%;
+background-color: lightblue;
+border-radius: 10px;
+}
+.you{
+    display: flex;
+ 
+    background-color:lightgreen ;
+   
+    margin: 10px;
+    width: 80%;
+    border-radius: 10px;
+}
