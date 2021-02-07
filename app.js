@@ -55,10 +55,10 @@ socketIO.on('connection',function(socket)
 }
 );
 
-http.listen(3000, function() {
+http.listen(process.env.PORT, function() {
   
 
-  mongoClient.connect("mongodb://localhost:27017",function(error,client){
+  mongoClient.connect("mongodb+srv://madhav:madhav123@instabook.fjgbv.mongodb.net/",function(error,client){
     var database=client.db("instabook");
    
 
