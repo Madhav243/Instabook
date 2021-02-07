@@ -61,9 +61,10 @@ body, html {
 .brand-name 
 {
     font-size: 2rem;
-       
-    /* -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; */
+       background: linear-gradient(90deg, rgba(131,58,180,1) 20%, rgba(253,29,29,0.9895308465182948) 86%, rgba(252,176,69,1) 100%);;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  
     background: transparent;
     font-family:'Pacifico', cursive; 
     font-weight: lighter;
@@ -209,10 +210,7 @@ body, html {
     .main{
         width:100%;
     }
-    .main .brand-name
-    {
-        font-size: 2rem;
-    }
+    
 }
 
 @media only screen and (min-width: 768px)  /* desktop */
@@ -221,7 +219,7 @@ body, html {
     {
         display: none;
     }
-    .main .brand-name
+    .main .brand-name2
     {
         display: none;
     }
