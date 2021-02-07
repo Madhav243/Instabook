@@ -248,7 +248,7 @@ http.listen(process.env.PORT, function() {
                       to: `${email}`,
                       subject:"Reset Password",
                       html:`<p>You requested for password reset</p>
-                      <h4>click on this <a href="https://${mainURL}/reset/${token}">link</a> to reset password</h4>`
+                      <h4>click on this <a href="${mainURL}/reset/${token}">link</a> to reset password</h4>`
                     });
 
                   result.json(
