@@ -40,7 +40,7 @@ function getUser()
                     alert(response.message);
                     localStorage.removeItem("accessToken");
                 }
-                if(window.location.href== mainURL+"/updateProfile")
+                if(typeof isUpdateProfile !== "undefined" && isUpdateProfile)
                 {
                     showProfileData(response.data);
                 }
@@ -1042,6 +1042,124 @@ function getProfileImage(id)
         return imageAddress;
     
 }
+
+
+
+function showMessageBox()
+    {
+        var _id=document.getElementById("userId").value;
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/getPreviousChat",true);
+        ajax.onreadystatechange = function()
+        {
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+                var html='';
+                for(var i=0;i<response.data.length;i++){
+                    var inbox=response.data[i];
+                    if(inbox.from==window.user._id)
+                    {
+                        html+='<div class="me">';
+                            html+='<div>';
+                                html+=inbox.message;
+                                html+='</div>';
+                                html+='</div>';
+                    }
+                    else{
+                        html+='<div class="you">';
+                            html+=inbox.message;
+                            html+='</div>';
+                    }
+                }
+                document.getElementById("chatBox").innerHTML=html;
+                var objDiv=document.getElementById("chatBox");
+                objDiv.scrollTop=objDiv.scrollHeight;
+                connectSocket();
+            }
+
+        };
+
+        var formData=new FormData();
+        formData.append("_id",_id);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        ajax.send(formData);
+
+
+    }
+
+    
+    function doSendMessage(form){
+        var message=form.message.value;
+        var _id=document.getElementById("userId").value;
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/sendMessage",true);
+
+        ajax.onreadystatechange=function(){
+            if(this.readyState==4 && this.status==200){
+                var response = JSON.parse(this.responseText);
+
+                if(response.status=="success"){
+                    var html='';
+                    html+='<div class="me">';
+                            html+='<div>';
+                                html+=message;
+                                html+='</div>';
+                                html+='</div>';
+                    document.getElementById("chatBox").innerHTML +=html;
+                    form.message.value='';
+                    var objDiv=document.getElementById("chatBox");
+                    objDiv.scrollTop=objDiv.scrollHeight;
+
+                }
+            }
+        };
+        var formData = new FormData(form);
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+        formData.append("_id",_id);
+        ajax.send(formData);
+
+        return false;
+
+    }
+
+    function connectSocket()
+    {
+        var _id=document.getElementById("userId").value;
+        var ajax=new XMLHttpRequest();
+        ajax.open("POST","/connectSocket",true);
+        ajax.onreadystatechange= function(){
+            if(this.readyState==4 && this.status==200)
+            {
+                var response=JSON.parse(this.responseText);
+
+                socketIO.on("messageReceived",function(messageObj){
+                    if(messageObj.from==_id)
+                    {
+                        var html='';
+                        html+='<div class="you">';
+                            html+=messageObj.message;
+                            html+='</div>';
+                            document.getElementById("chatBox").innerHTML +=html;
+                    
+                    var objDiv=document.getElementById("chatBox");
+                    objDiv.scrollTop=objDiv.scrollHeight;
+
+
+
+                    }
+                });
+            }
+        };
+        var formData = new FormData();
+        formData.append("accessToken",localStorage.getItem("accessToken"));
+       
+        ajax.send(formData);
+
+    }
+
+
+
 
 
 
