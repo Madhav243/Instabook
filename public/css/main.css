@@ -60,7 +60,7 @@ body, html {
 
 .brand-name 
 {
-    font-size: 2rem;
+    font-size: 4rem;
     background: linear-gradient(90deg, rgba(131,58,180,1) 20%, rgba(253,29,29,0.9895308465182948) 86%, rgba(252,176,69,1) 100%);;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -208,6 +208,7 @@ body, html {
     .main{
         width:100%;
     }
+    
     
 }
 
