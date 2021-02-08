@@ -417,6 +417,7 @@ http.listen(process.env.PORT, function() {
           "message": "User has been logged out. Please login again."
         });
       } else {
+        console.log(request.files.profileImage);
 
         if (request.files.profileImage.size > 0 && request.files.profileImage.type.includes("image")) {
 

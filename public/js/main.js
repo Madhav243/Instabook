@@ -1,7 +1,6 @@
 
 
-// var mainURL = "https://instabook.herokuapp.com";
-var mainURL=__dirname;
+var mainURL = "https://instabook.herokuapp.com";
 var socketIO = io(mainURL);
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
