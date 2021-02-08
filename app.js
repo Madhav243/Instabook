@@ -49,8 +49,8 @@ var cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
 cloud_name:'madhav098',
-api_key:'983722728548559',
-api_secret:'xh5f74XHSHC5chVnIEr6xEzf1Kw'
+api_key:'*********',
+api_secret:'********'
 });
 
 var lodash=require("lodash");
@@ -71,7 +71,7 @@ socketIO.on('connection',function(socket)
 http.listen(process.env.PORT, function() {
   
 
-  mongoClient.connect("mongodb+srv://madhav:madhav123@instabook.fjgbv.mongodb.net/",function(error,client){
+  mongoClient.connect("mongodb+srv://madhav:<password>@instabook.fjgbv.mongodb.net/",function(error,client){
     var database=client.db("instabook");
    
 
