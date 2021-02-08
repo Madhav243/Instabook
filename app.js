@@ -44,7 +44,8 @@ var socketIO=require("socket.io")(http);
 var socketID="";
 var users=[];
 
-var mainURL="https://instabook.herokuapp.com";
+// var mainURL="https://instabook.herokuapp.com";
+var mainURL=__dirname;
 //main url also in header chnge  and footer alsowhile deploying
 
 socketIO.on('connection',function(socket)
