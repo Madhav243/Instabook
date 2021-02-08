@@ -67,8 +67,8 @@ socketIO.on('connection',function(socket)
 
 }
 );
-// process.env.PORT
-http.listen(3000, function() {
+// 3000
+http.listen(process.env.PORT, function() {
   
 
   mongoClient.connect("mongodb+srv://madhav:madhav123@instabook.fjgbv.mongodb.net/",function(error,client){
