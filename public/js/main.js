@@ -495,7 +495,7 @@ function onSearch(button) {
                                                                         html+='<label >';
                                                                             html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
                                        
-                                                                                html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + data.profileImage + '">';
+                                                                                html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + data.profileImage + '">';
                                                                                 html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.username+'</h3>';
                                                                                     var createdAt = new Date(post.createdAt);
                                                                                 var date = createdAt.getDate() + "";
@@ -510,10 +510,10 @@ function onSearch(button) {
                                                                                 html+='</div>';
                                                                                 html+='<div class="post-image-video" style="padding: 10px; border-bottom: 1px solid rgba(133, 130, 130, 0.486);">';
                                                                                 if (post.image != "") {
-                                                                                    html+='<img src="' + mainURL + "/" + post.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
+                                                                                    html+='<img src="'+ post.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
                                                                                 }
                                                                                 if (post.video != "") {
-                                                                                    html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="' + mainURL + "/" + post.video + '"></video>';     
+                                                                                    html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="'+ post.video + '"></video>';     
                                                                                 }
                                                                                 html+='<div class="post-caption">'+ post.caption+'</div></div>';
                                                                                 html+=createLikesSection(post);
@@ -559,7 +559,7 @@ function onSearch(button) {
                                                                         html+='<label >';
                                                                             html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
 
-                                                                                html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + data.profileImage + '">';
+                                                                                html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="'+ data.profileImage + '">';
                                                                                 html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.username+'</h3>';
                                                                                     var createdAt = new Date(post.createdAt);
                                                                                 var date = createdAt.getDate() + "";
@@ -574,10 +574,10 @@ function onSearch(button) {
                                                                                 html+='</div>';
                                                                                 html+='<div class="post-image-video" style="padding: 10px; border-bottom: 1px solid rgba(133, 130, 130, 0.486);">';
                                                                                 if (post.image != "") {
-                                                                                    html+='<img src="' + mainURL + "/" + post.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
+                                                                                    html+='<img src="'+ post.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
                                                                                 }
                                                                                 if (post.video != "") {
-                                                                                    html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="' + mainURL + "/" + post.video + '"></video>';     
+                                                                                    html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="'+ post.video + '"></video>';     
                                                                                 }
                                                                                 html+='<div class="post-caption">'+ post.caption+'</div></div>';
                                                                                 html+=createLikesSection(post);
