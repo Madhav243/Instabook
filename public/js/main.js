@@ -132,10 +132,10 @@ function updateProfile(form)
 
 function onSearch(button) {
         window.location.href = "/search/" + button.previousElementSibling.value ;
-    }
+}
 
 
-    function showSearchResults() {
+function showSearchResults() {
         var ajax = new XMLHttpRequest();
         ajax.open("POST", "/search", true);
         
@@ -246,9 +246,9 @@ function onSearch(button) {
         var formData = new FormData();
 		formData.append("query", document.getElementById("query").value);
 		ajax.send(formData);
-    }
+}
 
-    function sendFriendRequest(self)
+function sendFriendRequest(self)
     {
         var _id=self.getAttribute("data-id");
         var ajax=new XMLHttpRequest();
@@ -273,10 +273,10 @@ function onSearch(button) {
         formData.append("_id",_id);
         formData.append("accessToken",localStorage.getItem("accessToken"));
         ajax.send(formData);
-    }
+}
 
 
-    function doAccept(self)
+function doAccept(self)
     {
         var _id=self.getAttribute("data-id");
         var ajax = new XMLHttpRequest();
@@ -299,9 +299,9 @@ function onSearch(button) {
         ajax.send(formData);
 
 
-    }
+}
 
-    function doUnfriend(self)
+function doUnfriend(self)
     {
         if(confirm("Are you sure?")){
             var _id=self.getAttribute("data-id");
@@ -327,11 +327,11 @@ function onSearch(button) {
         
 
 
-    }
+}
 
 
 
-    function showNotifications()
+function showNotifications()
     {
 
         var ajax= new XMLHttpRequest();
@@ -427,11 +427,11 @@ function onSearch(button) {
 
 
 
-    }
+}
 
 
 
-    function showProfile(){
+function showProfile(){
         var username=document.getElementById("userProfile").value;
         var ajax=new XMLHttpRequest();
         ajax.open("POST","/getUserProfile",true);
@@ -645,10 +645,10 @@ function onSearch(button) {
         formData.append("username",username);
         formData.append("accessToken",localStorage.getItem("accessToken"));
         ajax.send(formData);
-    }
+}
 
 
-    function showMessageFriends(){
+function showMessageFriends(){
         var html='';
         for(var a=0;a<window.user.friends.length;a++){
             var data=window.user.friends[a];
@@ -673,14 +673,14 @@ function onSearch(button) {
         }
         document.getElementById("friends2").innerHTML=html;
         
-    }
+}
     
 
-    function redirect(username,id){
+function redirect(username,id){
         window.location.href=mainURL +'/messages/'+username+'/'+id;
-    } 
+} 
 
-    function showFriends()
+function showFriends()
     {
         var html='';
         for(var a=0;a<window.user.friends.length;a++)
@@ -711,7 +711,7 @@ function onSearch(button) {
         }
         document.getElementById("friends").innerHTML=html;
 
-    }
+}
 
 function doLogout()
 {
@@ -799,7 +799,7 @@ function createLikesSection(data)
          return html;            
      
      
-     }
+}
      
 function toggleLikePost(self)
      {
@@ -839,7 +839,7 @@ function toggleLikePost(self)
          ajax.send(formData);
      
      
-     }
+}
    
 function createCommentsSection(data)
 {
@@ -1043,8 +1043,6 @@ function getProfileImage(id)
     
 }
 
-
-
 function showMessageBox()
     {
         var _id=document.getElementById("userId").value;
@@ -1086,10 +1084,10 @@ function showMessageBox()
         ajax.send(formData);
 
 
-    }
+}
 
     
-    function doSendMessage(form){
+function doSendMessage(form){
         var message=form.message.value;
         var _id=document.getElementById("userId").value;
         var ajax=new XMLHttpRequest();
@@ -1121,9 +1119,9 @@ function showMessageBox()
 
         return false;
 
-    }
+}
 
-    function connectSocket()
+function connectSocket()
     {
         var _id=document.getElementById("userId").value;
         var ajax=new XMLHttpRequest();
@@ -1156,10 +1154,7 @@ function showMessageBox()
        
         ajax.send(formData);
 
-    }
-
-
-
+}
 
 
 

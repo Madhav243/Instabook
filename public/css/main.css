@@ -151,7 +151,7 @@ body, html {
     box-shadow:0 8px 32px 0 rgba(23, 27, 90, 0.747);
     backdrop-filter: blur(8px); 
     -webkit-backdrop-filter: blur(8px);
-    height: 60%; 
+    /* height: 60%;  */
     top: 3%; 
     left:-270px; 
     /* left: 0; */
