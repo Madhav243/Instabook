@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -15,17 +15,14 @@
   "engines": {
     "node": "12.18.3"
   },
-
   "bugs": {
     "url": "https://github.com/Madhav243/Instabook/issues"
-  },
-  "scripts": {
-    "start": "node app.js"
   },
   "homepage": "https://github.com/Madhav243/Instabook#readme",
   "dependencies": {
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "cloudinary": "^1.24.0",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
@@ -33,11 +30,11 @@
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
     "mongoose": "^5.11.10",
     "nodemailer": "^6.4.17",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "nodemon": "^2.0.7",
     "socket.io": "^3.1.1"
   }
-  
 }

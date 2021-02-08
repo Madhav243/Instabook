@@ -44,8 +44,20 @@ var socketIO=require("socket.io")(http);
 var socketID="";
 var users=[];
 
-// var mainURL="https://instabook.herokuapp.com";
-var mainURL=__dirname;
+
+var cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+cloud_name:'madhav098',
+api_key:'983722728548559',
+api_secret:'xh5f74XHSHC5chVnIEr6xEzf1Kw'
+});
+
+var lodash=require("lodash");
+
+// var mainURL="localhost:3000";
+var mainURL="https://instabook.herokuapp.com";
+// var mainURL=__dirname;
 //main url also in header chnge  and footer alsowhile deploying
 
 socketIO.on('connection',function(socket)
@@ -55,8 +67,8 @@ socketIO.on('connection',function(socket)
 
 }
 );
-
-http.listen(process.env.PORT, function() {
+// process.env.PORT
+http.listen(3000, function() {
   
 
   mongoClient.connect("mongodb+srv://madhav:madhav123@instabook.fjgbv.mongodb.net/",function(error,client){
@@ -417,7 +429,7 @@ http.listen(process.env.PORT, function() {
           "message": "User has been logged out. Please login again."
         });
       } else {
-        console.log(request.files.profileImage);
+        // console.log(request.files.profileImage);
 
         if (request.files.profileImage.size > 0 && request.files.profileImage.type.includes("image")) {
 
@@ -426,25 +438,41 @@ http.listen(process.env.PORT, function() {
               //
             });
           }
-
-          profileImage = "public/image/" + new Date().getTime() + "-" + request.files.profileImage.name;
-          fileSystem.rename(request.files.profileImage.path, profileImage, function (error) {
-            //
-          });
-          
-          database.collection("users").updateOne({
-            "accessToken": accessToken
-          }, {
-            $set: {
-              "profileImage": profileImage
-            }
-          }, function (error, data) {
-            result.json({
-              "status": "status",
-              "message": "Profile image has been updated.",
-              "data": mainURL + "/" + profileImage
+          cloudinary.uploader.upload(request.files.profileImage.path,function(err,res){
+            console.log(res.url);
+            profileImage=res.url;
+            database.collection("users").updateOne({
+              "accessToken": accessToken
+            }, {
+              $set: {
+                "profileImage": profileImage
+              }
+            }, function (error, data) {
+              result.json({
+                "status": "status",
+                "message": "Profile image has been updated.",
+                "data": profileImage
+              });
             });
           });
+          // profileImage = "public/image/" + new Date().getTime() + "-" + request.files.profileImage.name;
+          // fileSystem.rename(request.files.profileImage.path, profileImage, function (error) {
+          //   //
+          // });
+          
+          // database.collection("users").updateOne({
+          //   "accessToken": accessToken
+          // }, {
+          //   $set: {
+          //     "profileImage": profileImage
+          //   }
+          // }, function (error, data) {
+          //   result.json({
+          //     "status": "status",
+          //     "message": "Profile image has been updated.",
+          //     "data": profileImage
+          //   });
+          // });
         } else {
           result.json({
             "status": "error",
@@ -484,61 +512,153 @@ http.listen(process.env.PORT, function() {
         });
       } else {
         if (request.files.image.size > 0 && request.files.image.type.includes("image")) {
-          image = "public/image/" + new Date().getTime() + "-" + request.files.image.name;
-          fileSystem.rename(request.files.image.path, image, function (error) {
-            //
+          cloudinary.uploader.upload(request.files.image.path,function(err,res){
+            console.log(res);
+            image=res.url;
+            database.collection("posts").insertOne({
+              "caption": caption,
+              "image": image,
+              "video": video,
+              "type": type,
+              "createdAt": createdAt,
+              "likers": [],
+              "comments": [],
+              "shares": [],
+              "user": {
+                "_id": user._id,
+                "name": user.name,
+                "username": user.username,
+                
+              }
+            }, function (error, data) {
+    
+              database.collection("users").updateOne({
+                "accessToken": accessToken
+              }, {
+                $push: {
+                  "posts": {
+                    "_id": data.insertedId,
+                    "caption": caption,
+                    "image": image,
+                    "video": video,
+                    "type": type,
+                    "createdAt": createdAt,
+                    "likers": [],
+                    "comments": [],
+                    "shares": []
+                  }
+                }
+              }, function (error, data) {
+    
+                result.json({
+                  "status": "success",
+                  "message": "Post has been uploaded."
+                });
+              });
+            });
+    
           });
+          // image = "public/image/" + new Date().getTime() + "-" + request.files.image.name;
+          // fileSystem.rename(request.files.image.path, image, function (error) {
+          //   //
+          // });
         }
 
         if (request.files.video.size > 0 && request.files.video.type.includes("video")) {
-
-          video = "public/videos/" + new Date().getTime() + "-" + request.files.video.name;
-          fileSystem.rename(request.files.video.path, video, function (error) {
-            //
+          cloudinary.uploader.upload(request.files.video.path,function(err,res){
+            console.log(res);
+            video=res.url;
+            database.collection("posts").insertOne({
+              "caption": caption,
+              "image": image,
+              "video": video,
+              "type": type,
+              "createdAt": createdAt,
+              "likers": [],
+              "comments": [],
+              "shares": [],
+              "user": {
+                "_id": user._id,
+                "name": user.name,
+                "username": user.username,
+                
+              }
+            }, function (error, data) {
+    
+              database.collection("users").updateOne({
+                "accessToken": accessToken
+              }, {
+                $push: {
+                  "posts": {
+                    "_id": data.insertedId,
+                    "caption": caption,
+                    "image": image,
+                    "video": video,
+                    "type": type,
+                    "createdAt": createdAt,
+                    "likers": [],
+                    "comments": [],
+                    "shares": []
+                  }
+                }
+              }, function (error, data) {
+    
+                result.json({
+                  "status": "success",
+                  "message": "Post has been uploaded."
+                });
+              });
+            });
+    
           });
+
+          // video = "public/videos/" + new Date().getTime() + "-" + request.files.video.name;
+          // fileSystem.rename(request.files.video.path, video, function (error) {
+          //   //
+          // });
         }
 
-        database.collection("posts").insertOne({
-          "caption": caption,
-          "image": image,
-          "video": video,
-          "type": type,
-          "createdAt": createdAt,
-          "likers": [],
-          "comments": [],
-          "shares": [],
-          "user": {
-            "_id": user._id,
-            "name": user.name,
-            "username": user.username,
+        // database.collection("posts").insertOne({
+        //   "caption": caption,
+        //   "image": image,
+        //   "video": video,
+        //   "type": type,
+        //   "createdAt": createdAt,
+        //   "likers": [],
+        //   "comments": [],
+        //   "shares": [],
+        //   "user": {
+        //     "_id": user._id,
+        //     "name": user.name,
+        //     "username": user.username,
             
-          }
-        }, function (error, data) {
+        //   }
+        // }, function (error, data) {
 
-          database.collection("users").updateOne({
-            "accessToken": accessToken
-          }, {
-            $push: {
-              "posts": {
-                "_id": data.insertedId,
-                "caption": caption,
-                "image": image,
-                "video": video,
-                "type": type,
-                "createdAt": createdAt,
-                "likers": [],
-                "comments": [],
-                "shares": []
-              }
-            }
-          }, function (error, data) {
+        //   database.collection("users").updateOne({
+        //     "accessToken": accessToken
+        //   }, {
+        //     $push: {
+        //       "posts": {
+        //         "_id": data.insertedId,
+        //         "caption": caption,
+        //         "image": image,
+        //         "video": video,
+        //         "type": type,
+        //         "createdAt": createdAt,
+        //         "likers": [],
+        //         "comments": [],
+        //         "shares": []
+        //       }
+        //     }
+        //   }, function (error, data) {
 
-            result.json({
-              "status": "success",
-              "message": "Post has been uploaded."
-            });
-          });
-        });
+        //     result.json({
+        //       "status": "success",
+        //       "message": "Post has been uploaded."
+        //     });
+        //   });
+        // });
 
 
       }

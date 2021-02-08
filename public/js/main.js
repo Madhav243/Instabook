@@ -1,12 +1,12 @@
 
-
+// var mainURL="localhost:3000";
 var mainURL = "https://instabook.herokuapp.com";
 var socketIO = io(mainURL);
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 
 function showaddPostProfile(user){
-    document.getElementById("profile-image-display").setAttribute("src",mainURL + "/" + user.profileImage);
+    document.getElementById("profile-image-display").setAttribute("src",user.profileImage);
 }
 
 function onSearch(button) {
@@ -186,7 +186,7 @@ function onSearch(button) {
                                 html+='<label>';
                                     html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
                                         var proImage=getProfileImage(data._id); 
-                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
+                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + proImage + '">';
                                             html+='<label style="cursor: pointer;">';
                                                 html+='<h3 >'+data.username+'</h3>';
                                                     html+='</label>';
@@ -457,7 +457,7 @@ function onSearch(button) {
                     html+='<div class="backgroundDiv" style="display: flex; flex-direction: row;" >';
                         html+='<div class="image-name-about" >';
                             var proImage=getProfileImage(data._id); 
-                            html+='<img src="' + mainURL + "/" + proImage + '">';
+                            html+='<img src="' + proImage + '">';
                             html+='<h3>';
                                 html+=data.name;
                                 html+='</h3>';
@@ -660,7 +660,7 @@ function onSearch(button) {
                             html+='<label>';
                                 html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
                                     var proImage=getProfileImage(data._id); 
-                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
+                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + proImage + '">';
                                             html+='<label style="cursor: pointer;">';
                                                 html+='<h3 >'+data.name+'</h3>';
                                                     html+='</label>';
@@ -693,7 +693,7 @@ function onSearch(button) {
                                 html+='<label>';
                                     html+='<a href="/user/'+data.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
                                         var proImage=getProfileImage(data._id); 
-                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
+                                        html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="'+ proImage + '">';
                                             html+='<label style="cursor: pointer;">';
                                                 html+='<h3 >'+data.username+'</h3>';
                                                     html+='</label>';
@@ -847,7 +847,7 @@ function createCommentsSection(data)
     html+='<div class="comment-section" >';
         html+='<div class="comment-input" >';
             html+='<a href="/user/'+ window.user.username +'" style="display: flex; align-items: center; color:black; text-decoration: none;">';
-                html+='<img src="' + mainURL + '/' + window.user.profileImage + '" class="comment-input-image" >';
+                html+='<img src="'+ window.user.profileImage + '" class="comment-input-image" >';
                 html+='<label  class="comment-input-username" ><h4>'+ window.user.username+'</h4> </label></a>';
                 html+='<form method="post" onsubmit="return doPostComment(this);" class="comment-input-form">';
                     html += '<input type="hidden" name="_id" value="' + data._id + '">';
@@ -864,7 +864,7 @@ function createCommentsSection(data)
                             html+='<div class="user-details">';
                                 html+='<a href="/user/'+comment.user.username+'" style="display: flex; align-items: center; color:black; text-decoration: none;">';
                                     var proImage=getProfileImage(comment.user._id);
-                                    html+='<img src="'+mainURL + '/' + proImage +'" style="width: 60px; height:60px;border-radius: 100%; margin: 10px; " >';
+                                    html+='<img src="'+ proImage +'" style="width: 60px; height:60px;border-radius: 100%; margin: 10px; " >';
                                     html+='<label  style="margin-left: 10px; margin-right: 10px;"><h4>'+comment.user.username+'</h4></label>';
                                     var createdAt = new Date(comment.createdAt);
 									var date = createdAt.getDate() + "";
@@ -883,7 +883,7 @@ function createCommentsSection(data)
                                                 html+='<div class="user-details" >';
                                                     html+='<a href="/user/'+reply.user.username +'" style="display: flex; align-items: center;color:black; text-decoration: none;" >';
                                                         var proImage=getProfileImage(reply.user._id);
-                                                        html+='<img src="' + mainURL + '/' + proImage + '" style="width: 50px;height:50px; border-radius: 100%;margin-right: 10px;" >';
+                                                        html+='<img src="'+ proImage + '" style="width: 50px;height:50px; border-radius: 100%;margin-right: 10px;" >';
                                                         html+='<label  style="margin-left: 10px; margin-right: 10px;"><h4>'+ reply.user.username+'</h4> </label>';
                                                         var createdAt = new Date(reply.createdAt);
 												var date = createdAt.getDate() + "";
@@ -1210,7 +1210,7 @@ function showNewsfeed()
                                 html+='<label >';
                                     html+='<a href="/user/'+data.user.username+'" style="display: flex; align-items: center; text-decoration: none; color: black; margin: 10px 0;">';
                                     var proImage=getProfileImage(data.user._id);   
-                                    html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="' + mainURL + "/" + proImage + '">';
+                                    html+='<img style="width: 60px; height: 60px; border-radius: 100%;margin: 0 20px; " class="postcard-profileImage" src="'+ proImage + '">';
                                     
                                     html+='<label style="display: flex; flex-direction: column;" ><h3 >'+data.user.username+'';
                                     if(data.type=="shared"){
@@ -1230,10 +1230,10 @@ function showNewsfeed()
                                     html+='</div>';
                                     html+='<div class="post-image-video" style="padding: 10px; border-bottom: 1px solid rgba(133, 130, 130, 0.486);">';
                                     if (data.image != "") {
-                                        html+='<img src="' + mainURL + "/" + data.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
+                                        html+='<img src="'+data.image + '" style="height: 300px; width: 300px; padding: 10px; ">';
                                     }
                                     if (data.video != "") {
-                                        html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="' + mainURL + "/" + data.video + '"></video>';     
+                                        html+='<video style="height: 300px; width: 300px; padding: 10px; outline: none;" controls src="'+ data.video + '"></video>';     
                                     }
                                         
                                     html+='<div class="post-caption">'+ data.caption+'</div></div>';
